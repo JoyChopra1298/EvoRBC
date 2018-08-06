@@ -7,7 +7,7 @@ class Container:
 		"""adds the genome to container"""
 		raise NotImplementedError
 
-	def calculate_novelty(genome):
+	def calculate_novelty(self,genome):
 		"""calculate novelty for the genome"""
 		raise NotImplementedError
 

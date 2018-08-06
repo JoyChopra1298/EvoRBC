@@ -7,9 +7,9 @@ class Repertoire_Generator:
 		self.contatiner = container
 		self.selector = selector
 		self.mutation_rate = mutation_rate
-		self.current_iteration = 0
+		self.current_generation = 1
 
-	def generate_repertoire(self,save_dir,num_iterations,save_freq):
+	def generate_repertoire(self,save_dir,num_generations,save_freq):
 		"""
 		Generate a repertoire by applying a quality diversity algorithm ran for num_iterations number of iterations
 		Save the generated repo in the save_dir periodically after every save_freq iterations

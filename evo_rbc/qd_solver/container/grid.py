@@ -1,14 +1,14 @@
-from evo_rbc.qd_solver.container.container import Container
+from .container import Container
 
 class Grid(Container):
 
-	def __init__(env):
+	def __init__(self,env):
 		super().__init__(env)
 		
 	def add_genome(self,genome):
 		pass
 
-	def calculate_novelty(genome):
+	def calculate_novelty(self,genome):
 		pass
 
 	def update_container(self):

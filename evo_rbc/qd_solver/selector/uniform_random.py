@@ -1,4 +1,4 @@
-from evo_rbc.qd_solver.selector.selector import Selector
+from .selector import Selector
 
 class Uniform_Random(Selector):
 
