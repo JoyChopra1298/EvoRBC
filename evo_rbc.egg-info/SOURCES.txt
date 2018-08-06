@@ -1,5 +1,0 @@
-README.md
-evo_rbc.egg-info/PKG-INFO
-evo_rbc.egg-info/SOURCES.txt
-evo_rbc.egg-info/dependency_links.txt
-evo_rbc.egg-info/top_level.txt
