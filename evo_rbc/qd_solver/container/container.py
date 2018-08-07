@@ -23,3 +23,5 @@ class Container:
 		"""calculate maximum quality of genome in the conatiner, metric to compare different containers"""
 		raise NotImplementedError
 
+	def evaluate_quality_diversity_fitness():
+		raise NotImplementedError

@@ -9,3 +9,6 @@ class EAenv(gym.Env):
 		"""Evaluate fitness for the specific task"""
 		raise NotImplementedError
 
+	def quality_diversity_fitness_function():
+		raise NotImplementedError
+

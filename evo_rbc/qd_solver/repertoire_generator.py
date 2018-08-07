@@ -1,5 +1,3 @@
-from eaenv import EAenv
-
 class Repertoire_Generator:
 
 	def __init__(self,env,container,selector,mutation_rate):

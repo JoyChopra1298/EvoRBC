@@ -20,3 +20,5 @@ class Grid(Container):
 	def calculate_max_quality(self):
 		pass
 
+	def evaluate_quality_diversity_fitness():
+		pass
