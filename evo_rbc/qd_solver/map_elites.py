@@ -4,10 +4,15 @@ from .selector.uniform_random import Uniform_Random
 
 class MAP_Elites(Repertoire_Generator):
 
-	def __init__(env,mutation_rate):
-		container = Grid(env)
-		selector = Uniform_Random()
-		super().__init__(env,container,selector,mutation_rate)
+	def __init__(self,env,genome,mutation_rate=0.1,population_size=100):
+		self.container = Grid(env)
+		self.selector = Uniform_Random()
+		super().__init__(env,genome,self.container,self.selector,mutation_rate,population_size)
+		self.current_population = []
+		
+		## initialise population randomly
+		for i in range(population_size):
+			self.current_population.append(genome.sample_random_genome())
 
 	def generate_repertoire(self,save_dir,num_generations,save_freq):
 		pass

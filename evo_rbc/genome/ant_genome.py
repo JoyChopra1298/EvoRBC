@@ -15,16 +15,19 @@ class AntGenome(Genome):
 	smoothness_high = (np.pi/4) + 2*(np.pi)
 	epsilon_low = -0.5
 	epsilon_high = 0.5
+	# on exponential scale, example -1 would mean 1e-1
+	control_frequency_low = -3.0 
+	control_frequency_high = -1.0
 
 	parameter_space = spaces.Dict({
 		"amplitude_space":spaces.Box(low=amplitude_low,high=amplitude_high,shape=(8,1),dtype=np.float32),
 		"phase_space":spaces.Box(low=phase_low,high=phase_high,shape=(8,1),dtype=np.float32),
 		"smoothness_space":spaces.Box( low=np.array([smoothness_low]), high=np.array([smoothness_high]),dtype=np.float32),
-		"epsilon_space":spaces.Box(low=epsilon_low,high=epsilon_high,shape=(8,1),dtype=np.float32)})
+		"epsilon_space":spaces.Box(low=epsilon_low,high=epsilon_high,shape=(8,1),dtype=np.float32),
+		"control_frequency_space":spaces.Box( low=np.array([control_frequency_low]), high=np.array([control_frequency_high]),dtype=np.float32),})
 
-	def __init__(self,parameters=None,control_frequency=1e-2,seed=1):
+	def __init__(self,parameters=None,seed=1):
 		super().__init__(parameters)
-		self.control_frequency = control_frequency
 		self.seed = seed
 		## Set random number seed for all scipy and numpy operations so that experiments can be reproduced
 		np.random.seed(seed=seed)
@@ -56,7 +59,7 @@ class AntGenome(Genome):
 	
 	def control_function(self,joint_index,time_step):
 		"""Returns the action for corresponding joint from genome parameters"""
-		angle = time_step*self.control_frequency + self.parameters["phase"][joint_index]
+		angle = time_step*np.power(10,self.parameters["control_frequency"]) + self.parameters["phase"][joint_index]
 		sine = np.sin(2*(np.pi)*(angle))
 		tanh = (np.tanh(self.parameters["smoothness"])* sine) 
 		return self.parameters["epsilon"][joint_index] + self.parameters["amplitude"][joint_index]* tanh
