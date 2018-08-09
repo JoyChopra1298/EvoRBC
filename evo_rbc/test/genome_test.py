@@ -1,14 +1,11 @@
 from evo_rbc.genome.ant_genome import AntGenome
+from evo_rbc.test.utils import print_heading
 
 ant_genome = AntGenome()
 
 control_duration = 10
 num_generations = 0
-heading_decorator = "\n-------------------------------------------\n"
 joint_index = 1
-
-def print_heading(heading):
-	print(heading_decorator+heading+heading_decorator)
 
 print_heading("Parameter space")
 print(ant_genome.parameter_space)

@@ -1,10 +1,8 @@
 class Repertoire_Generator:
 
-	def __init__(self,env,genome,container,selector,mutation_rate,population_size):
+	def __init__(self,env,genome,mutation_rate,population_size):
 		self.env = env
 		self.genome = genome
-		self.contatiner = container
-		self.selector = selector
 		self.mutation_rate = mutation_rate
 		self.population_size = population_size
 		self.current_generation = 1

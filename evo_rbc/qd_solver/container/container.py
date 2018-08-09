@@ -1,27 +1,28 @@
+import numpy as np
 class Container:
 
-	def __init__(self,env):
-		self.env = env
+	def __init__(self):
+		self.num_genomes = 0
 
-	def add_genome(self,genome):
-		"""adds the genome to container"""
+		"""metrics to compare different containers"""
+		self.max_quality = -np.inf
+		self.total_quality = 0
+
+	def get_bin(self,behavior):
+		"""get the bin corresponding to a particular behavior"""
 		raise NotImplementedError
 
-	def calculate_novelty(self,genome):
-		"""calculate novelty for the genome"""
+	def is_high_quality(self,genome,behavior,quality):
+		"""check if genome has high quality then current genome for the same behavior"""
 		raise NotImplementedError
 
-	def update_container(self):
-		"""update novelty score for all genomes in the container"""
+	def add_genome(self,genome,behavior):
+		"""add the genome to container"""
 		raise NotImplementedError
 
-	def calculate_total_quality(self):
-		"""calculate total quality of the conatiner, metric to compare different containers"""
+	def save_container(self,save_dir):
 		raise NotImplementedError
 
-	def calculate_max_quality(self):
-		"""calculate maximum quality of genome in the conatiner, metric to compare different containers"""
+	def load_container(self,load_path):
 		raise NotImplementedError
-
-	def evaluate_quality_diversity_fitness():
-		raise NotImplementedError
+		

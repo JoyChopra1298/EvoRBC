@@ -19,10 +19,10 @@ class AntEAEnv(EAenv,AntEnv):
 		"""quality_diversity fitness function for a runner with steady velocity vector"""
 		done = False
 		self.reset()
-		""" arrays for vx,vy and vz for main body(torso) of ant. It's mean is used to calculate behavior(diversity)
+		""" arrays for vx,vy and rz for main body(torso) of ant. It's mean is used to calculate behavior(diversity)
 		 and variance is used to calulate performance(quality). 
-		 vz is forced to be close to 0 by accumulating it's absolute value and penalising that in fitness"""
-		body_velocity = {"vx":[],"vy":[],"vz":[]}
+		 rz is forced to not change by penalising it's variation(stddev)"""
+		torso_kinematics = {"vx":[],"vy":[],"rz":[]}
 		for time_step in range(self.max_time_steps_qd):
 			if(not done):
 				action = []
@@ -31,12 +31,15 @@ class AntEAEnv(EAenv,AntEnv):
 				observation, reward, done, info = self.step(action) 
 				if(visualise):
 					self.render()
+				position_vector = self.data.get_body_xpos("torso")
 				velocity_vector = self.data.get_body_xvelp("torso")
-				body_velocity["vx"].append(velocity_vector[0])
-				body_velocity["vy"].append(velocity_vector[1])
-				body_velocity["vz"].append(abs(velocity_vector[2]))
+				torso_kinematics["vx"].append(velocity_vector[0])
+				torso_kinematics["vy"].append(velocity_vector[1])
+				torso_kinematics["rz"].append(position_vector[2])
 
-		## since dividing behavior into bins depends on container so return a tuple (mean_vx,mean_vy) for behavior from env
-		behavior = {"vx_mean":stats.mean(body_velocity["vx"]),"vy_mean":stats.mean(body_velocity["vy"])}
-		performance = - (stats.stdev(body_velocity["vx"]) + stats.stdev(body_velocity["vy"]) + stats.mean(body_velocity["vz"]))
+		""" since dividing behavior into bins depends on container so just return a tuple (mean_vx,mean_vy) for behavior from env
+		also they are not attributes of genome like genome.behavior, genome.performance since can have various fitness func 
+		although then could use a dictionary"""
+		behavior = (stats.mean(torso_kinematics["vx"]),stats.mean(torso_kinematics["vy"]))
+		performance = - (stats.stdev(torso_kinematics["vx"]) + stats.stdev(torso_kinematics["vy"]) + stats.stdev(torso_kinematics["rz"]))
 		return (behavior,performance)

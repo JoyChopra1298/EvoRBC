@@ -4,10 +4,10 @@ from .selector.uniform_random import Uniform_Random
 
 class MAP_Elites(Repertoire_Generator):
 
-	def __init__(self,env,genome,mutation_rate=0.1,population_size=100):
-		self.container = Grid(env)
+	def __init__(self,env,genome,num_dimensions,lower_limit,upper_limit,resolution,mutation_rate=0.1,population_size=100):
+		self.container = Grid(num_dimensions=num_dimensions,lower_limit=lower_limit,upper_limit=upper_limit,resolution=resolution)
 		self.selector = Uniform_Random()
-		super().__init__(env,genome,self.container,self.selector,mutation_rate,population_size)
+		super().__init__(env,genome,mutation_rate,population_size)
 		self.current_population = []
 		
 		## initialise population randomly
