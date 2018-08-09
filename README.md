@@ -13,3 +13,6 @@ In the ant implementation, frequency is also taken as variable parameter since i
 
 ## Unified QD algorithm
 ![image](https://user-images.githubusercontent.com/27682820/43869088-6a746f8e-9b8e-11e8-957a-34453b922ce5.png)
+
+## Regarding cross over in map elites according to the paper
+![image](https://user-images.githubusercontent.com/27682820/43890083-6a89cf1e-9be3-11e8-9f75-abb636838c3f.png)
