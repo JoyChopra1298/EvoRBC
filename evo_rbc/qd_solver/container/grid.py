@@ -4,7 +4,7 @@ import copy
 
 class Grid(Container):
 
-	def __init__(self,num_dimensions,lower_limit,upper_limit,resolution):
+	def __init__(self,num_dimensions,lower_limit,upper_limit,resolution,min_curiosity=0.5,curiosity_multiplier=2):
 		"""lower_limit, upper_limit and resolution should be np arrays of shape (num_dimension) to specify them for each dimension"""
 		super().__init__()
 		self.num_dimensions = num_dimensions
@@ -12,6 +12,8 @@ class Grid(Container):
 		self.upper_limit = upper_limit
 		self.resolution = resolution
 		self.num_bins = np.ceil((upper_limit - lower_limit)/resolution).astype(int)
+		self.min_curiosity = min_curiosity
+		self.curiosity_multiplier = curiosity_multiplier
 		
 		#initialise grid with empty bins. will store a dict in each bin {"genome":,"quality":}
 		self.grid = {}

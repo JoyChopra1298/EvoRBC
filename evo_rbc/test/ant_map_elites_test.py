@@ -9,7 +9,6 @@ from evo_rbc.qd_solver.selector.curiosity_driven_selector import Curiosity_Drive
 
 seed = 1
 population_size = 100
-mutation_rate = 0.1
 max_time_steps_qd=1000
 max_time_steps_task=2000
 visualise = False
