@@ -1,5 +1,5 @@
 class Selector:
 	
-	def select(container,genomes):
-		"""select a batch of genomes from container and/or genomes"""
+	def select(sellf,ontainer,num_samples):
+		"""select a batch of genomes from container"""
 		raise NotImplementedError

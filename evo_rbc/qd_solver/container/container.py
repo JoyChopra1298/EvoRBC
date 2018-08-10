@@ -12,12 +12,16 @@ class Container:
 		"""get the bin corresponding to a particular behavior"""
 		raise NotImplementedError
 
-	def is_high_quality(self,genome,behavior,quality):
-		"""check if genome has high quality then current genome for the same behavior"""
+	def is_high_quality(self,behavior,quality):
+		"""check if genome has high quality then current genome for the same behavior. also true if bin is empty"""
 		raise NotImplementedError
 
 	def add_genome(self,genome,behavior):
 		"""add the genome to container"""
+		raise NotImplementedError
+
+	def update_bin(self,bin_index,genome_details):
+		"""updates the entry in bin. genome details consists of a dictionary of genome parameters"""
 		raise NotImplementedError
 
 	def save_container(self,save_dir):
