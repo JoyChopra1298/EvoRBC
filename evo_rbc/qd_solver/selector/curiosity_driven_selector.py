@@ -3,7 +3,10 @@ import random
 import numpy as np
 
 class Curiosity_Driven_Selector(Selector):
-
+	
+	def __init__(self,logger):
+		super().__init__(logger=logger)
+	
 	def select(self,container,num_samples):
 		"""Do a weighted selection based on curiosity scores. container is dict of dicts {"bin_index":{"genome","curiosity",other details},...}
 		print a warning if num_samples is more than container size"""
@@ -17,7 +20,7 @@ class Curiosity_Driven_Selector(Selector):
 		population_size = len(population)
 
 		if(num_samples>population_size):
-			print("WARNING from Curiosity selector- number of samples queried from container exceed it's size,"+
+			self.logger.warning("from Curiosity selector- number of samples queried from container exceed it's size,"+
 			 "returning all genomes")
 			num_samples = population_size
 		

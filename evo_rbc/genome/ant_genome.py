@@ -26,14 +26,16 @@ class AntGenome(Genome):
 		"epsilon_space":spaces.Box(low=epsilon_low,high=epsilon_high,shape=(8,1),dtype=np.float32),
 		"control_frequency_space":spaces.Box( low=np.array([control_frequency_low]), high=np.array([control_frequency_high]),dtype=np.float32),})
 
-	def __init__(self,parameters=None,seed=1):
-		super().__init__(parameters)
+	def __init__(self,logger,parameters=None,seed=1):
+		super().__init__(logger=logger,parameters=parameters)
 		self.seed = seed
 		## Set random number seed for all scipy and numpy operations so that experiments can be reproduced
 		np.random.seed(seed=seed)
+		self.logger.debug("Created random genome"+str(self.parameters))
 
 	def mutate(self,sigma=1):
 		"""Mutate the genome using a truncated gaussian"""
+		self.logger.debug("Mutating genome. Current parameters - "+str(self.parameters))
 		for key,value in self.parameters.items():
 			low = self.parameter_space.spaces[key+"_space"].low
 			high = self.parameter_space.spaces[key+"_space"].high
@@ -42,14 +44,17 @@ class AntGenome(Genome):
 			standard_low = (low - mu) / sigma
 			standard_high = (high - mu) / sigma
 			self.parameters[key] =  np.array(truncnorm.rvs(standard_low,standard_high , loc=mu, scale=sigma),dtype=np.float32)
+		self.logger.debug("Mutation finished. Mutated parameters "+str(self.parameters))
 		
 	def crossover(self,mate_genome):
 		"""Cross self with mate_genome. Take parameters from either parent randomly"""
+		self.logger.debug("Crossing genomes with parameters "+str(self.parameters)+str(mate_genome.parameters))
 		child_parameters = OrderedDict()
 		for key,value in self.parameters.items():
 			bit_mask = np.random.choice(2,value.shape)
 			child_parameters[key] = np.array(bit_mask*value + (1 - bit_mask)*mate_genome.parameters[key],dtype=np.float32)
-		return Genome(child_parameters)	
+		self.logger.debug("Child parameters "+str(child_parameters))
+		return AntGenome(logger=self.logger,parameters=child_parameters,seed=self.seed)	
 
 	def sample_random_genome(self):
 		ordered_dict = self.parameter_space.sample()
@@ -71,4 +76,3 @@ class AntGenome(Genome):
 	def load_genome(self,load_path):
 		"""Loads the genome parameters from load_path"""
 		raise NotImplementedError
-		

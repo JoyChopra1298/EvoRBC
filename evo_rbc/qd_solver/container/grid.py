@@ -4,9 +4,9 @@ import copy
 
 class Grid(Container):
 
-	def __init__(self,num_dimensions,lower_limit,upper_limit,resolution,min_curiosity=0.5,curiosity_multiplier=2):
+	def __init__(self,num_dimensions,lower_limit,upper_limit,resolution,logger,min_curiosity=0.5,curiosity_multiplier=2):
 		"""lower_limit, upper_limit and resolution should be np arrays of shape (num_dimension) to specify them for each dimension"""
-		super().__init__()
+		super().__init__(logger=logger)
 		self.num_dimensions = num_dimensions
 		self.lower_limit = lower_limit
 		self.upper_limit = upper_limit
@@ -17,6 +17,7 @@ class Grid(Container):
 		
 		#initialise grid with empty bins. will store a dict in each bin {"genome":,"quality":}
 		self.grid = {}
+		self.logger.debug("Grid initialised")
 		
 	def get_bin(self,behavior):
 		"""get the bin corresponding to a particular behavior, linear mapping is used. behavior is forced to be between limits by clipping it"""
@@ -44,6 +45,7 @@ class Grid(Container):
 		if(quality>self.max_quality):
 			self.max_quality = quality
 			self.max_quality_bin = bin_index
+			self.logger.debug("new max quality genome found with quality "+str(quality)+" and behavior "+str(behavior))
 		self.update_bin(bin_index,{"genome":genome,"quality":quality,"curiosity":1})
 
 	def update_bin(self,bin_index,genome_details):

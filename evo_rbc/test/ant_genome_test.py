@@ -1,7 +1,9 @@
 from evo_rbc.genome.ant_genome import AntGenome
 from evo_rbc.test.utils import print_heading
+import evo_rbc.test.utils as test_utils
 
-ant_genome = AntGenome()
+logger = test_utils.getLogger()
+ant_genome = AntGenome(logger=logger)
 
 control_duration = 10
 num_generations = 0
@@ -28,7 +30,7 @@ for i in range(num_generations):
 		print(ant_genome.control_function(joint_index,time_step))
 
 print_heading("Genome 2")
-ant_genome_2 = AntGenome()
+ant_genome_2 = AntGenome(logger=logger)
 print(ant_genome_2.parameters)
 
 print_heading("Child Genome")

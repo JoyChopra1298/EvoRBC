@@ -1,7 +1,10 @@
+import copy
+
 class Genome:
 	parameter_space = None
 
-	def __init__(self,parameters=None):
+	def __init__(self,logger,parameters=None):
+		self.logger = logger
 		if(parameters==None):
 			self.parameters = self.sample_random_genome()
 		else:
@@ -30,4 +33,17 @@ class Genome:
 	def load_genome(self,load_path):
 		"""Loads the genome from load_path"""
 		raise NotImplementedError
+
+	def __deepcopy__(self, memo):
+		cls = self.__class__
+		result = cls.__new__(cls)
+		memo[id(self)] = result
+		for k, v in self.__dict__.items():
+			if(k=="logger"):
+				setattr(result, k, v)
+				continue
+			setattr(result, k, copy.deepcopy(v, memo))
+		return result
+		
+
 		

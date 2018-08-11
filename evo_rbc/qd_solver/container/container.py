@@ -1,7 +1,8 @@
 import numpy as np
 class Container:
 
-	def __init__(self):
+	def __init__(self,logger):
+		self.logger = logger
 		self.num_genomes = 0
 
 		"""metrics to compare different containers"""

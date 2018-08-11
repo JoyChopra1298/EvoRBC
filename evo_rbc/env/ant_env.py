@@ -4,10 +4,11 @@ import statistics as stats
 
 class AntEAEnv(EAenv,AntEnv):
 
-	def __init__(self,seed=1,max_time_steps_qd=1000,max_time_steps_task=2000):
+	def __init__(self,logger,seed=1,max_time_steps_qd=1000,max_time_steps_task=2000):
 		AntEnv.__init__(self)
 		self.seed(seed)
-		EAenv.__init__(self,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task)
+		EAenv.__init__(self,logger=logger,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task)
+		self.logger.debug("Created ant environment")
 
 	def evaluate_task_fitness(self,task_funtion,arbitrator_genome,visualise=False):
 		raise NotImplementedError
@@ -23,6 +24,7 @@ class AntEAEnv(EAenv,AntEnv):
 		 and variance is used to calulate performance(quality). 
 		 rz is forced to not change by penalising it's variation(stddev)"""
 		torso_kinematics = {"vx":[],"vy":[],"rz":[]}
+		self.logger.debug("Starting an evaluation for steady runner ant")
 		for time_step in range(self.max_time_steps_qd):
 			if(not done):
 				action = []
@@ -42,4 +44,5 @@ class AntEAEnv(EAenv,AntEnv):
 		although then could use a dictionary"""
 		behavior = (stats.mean(torso_kinematics["vx"]),stats.mean(torso_kinematics["vy"]))
 		performance = - (stats.stdev(torso_kinematics["vx"]) + stats.stdev(torso_kinematics["vy"]) + stats.stdev(torso_kinematics["rz"]))
+		self.logger.debug("Evaluation finished with\nbehavior "+str(behavior)+"\nperformance "+str(performance))
 		return (behavior,performance)

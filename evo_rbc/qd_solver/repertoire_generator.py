@@ -1,9 +1,11 @@
 class Repertoire_Generator:
 
-	def __init__(self,env,genome,batch_size):
+	def __init__(self,env,genome_constructor,batch_size,logger,seed=1):
 		self.env = env
-		self.genome = genome
+		self.genome_constructor = genome_constructor
 		self.batch_size = batch_size
+		self.seed = seed
+		self.logger = logger
 		self.current_generation = 1
 
 	def generate_repertoire(self,save_dir,num_iterations,save_freq,visualise):
