@@ -28,7 +28,7 @@ class Grid(Container):
 		"""check if genome has high quality then current genome for the same behavior. also true if bin is empty
 		   behavior should be a tuple with dimensions num_dimension"""
 		bin_index = self.get_bin(behavior)
-		if ((bin_index in self.grid) and self.grid[bin_index]["quality"]<=quality):
+		if ((bin_index in self.grid) and self.grid[bin_index]["quality"]>=quality):
 			return False
 		else:
 			return True

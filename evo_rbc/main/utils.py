@@ -1,4 +1,4 @@
-import logging
+import logging,os
 
 heading_decorator = "\n-------------------------------------------\n"
 
@@ -6,6 +6,8 @@ def print_heading(heading):
 	print(heading_decorator+heading+heading_decorator)
 
 save_dir = "output/"
+os.makedirs(os.path.dirname(save_dir), exist_ok=True)
+
 debug_logfile = save_dir+"ant_map_elites_debug.log"
 logfile = save_dir+"ant_map_elites.log"
 
