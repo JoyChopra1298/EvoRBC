@@ -11,7 +11,7 @@ from evo_rbc.qd_solver.selector.curiosity_driven_selector import Curiosity_Drive
 ##################################
 #Constants/hyperparameters
 seed = 1
-batch_size = 1
+batch_size = 100
 max_time_steps_qd=1000
 max_time_steps_task=2000
 visualise = False

@@ -1,10 +1,6 @@
 from evo_rbc.main.ant_map_elites.common import get_MAPElites
 
 load_path = "output/ant_map_elites_repertoire_2.pkl"
-num_iterations = 3
-save_freq = 2
-visualise = False
-save_dir = "output/"
 
 map_elites = get_MAPElites()
 map_elites.load_repertoire(load_path)
