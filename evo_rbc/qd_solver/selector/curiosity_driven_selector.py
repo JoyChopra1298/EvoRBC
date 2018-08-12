@@ -4,8 +4,8 @@ import numpy as np
 
 class Curiosity_Driven_Selector(Selector):
 	
-	def __init__(self,logger):
-		super().__init__(logger=logger)
+	def __init__(self):
+		super().__init__()
 	
 	def select(self,container,num_samples):
 		"""Do a weighted selection based on curiosity scores. container is dict of dicts {"bin_index":{"genome","curiosity",other details},...}

@@ -3,8 +3,8 @@ import numpy as np
 
 class Uniform_Random_Selector(Selector):
 
-	def __init__(self,logger):
-		super().__init__(logger=logger)
+	def __init__(self):
+		super().__init__()
 
 	def select(self,container,num_samples):
 		"""select num_samples from container. container is dict of dicts {"bin_index":{"genome","quality",other details},...}

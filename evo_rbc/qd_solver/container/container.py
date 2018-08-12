@@ -1,12 +1,15 @@
 import numpy as np
+import evo_rbc.main.utils as utils
+
 class Container:
 
-	def __init__(self,logger):
-		self.logger = logger
+	def __init__(self):
+		self.logger = utils.getLogger()
 		self.num_genomes = 0
 
 		"""metrics to compare different containers"""
 		self.max_quality = -np.inf
+		self.min_quality = np.inf
 		self.total_quality = 0
 
 	def get_bin(self,behavior):
@@ -30,4 +33,18 @@ class Container:
 
 	def load_container(self,load_path):
 		raise NotImplementedError
+		
+	def __getstate__(self):
+		excluded_subnames = ["logger"]
+		state = {}
+		for k, v in self.__dict__.items():
+			if(k=="logger"):
+				continue
+			state[k] = v
+		return state
+
+	def __setstate__(self, state):
+		for k,v in state.items():
+			self.__dict__[k] = v
+		self.logger = utils.getLogger()
 		

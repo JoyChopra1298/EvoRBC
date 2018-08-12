@@ -1,31 +1,33 @@
 from .repertoire_generator import Repertoire_Generator
 from .container.grid import Grid
-import copy
+import copy,os
 import numpy as np
+import pickle
 
 class MAP_Elites(Repertoire_Generator):
 
-	def __init__(self,env,qd_function,genome_constructor,selector,num_dimensions,lower_limit,upper_limit,resolution,batch_size,logger,seed=1):
-		self.container = Grid(num_dimensions=num_dimensions,lower_limit=lower_limit,upper_limit=upper_limit,resolution=resolution,logger=logger)
+	def __init__(self,env,qd_function,genome_constructor,selector,num_dimensions,lower_limit,upper_limit,resolution,batch_size,seed=1):
+		self.container = Grid(num_dimensions=num_dimensions,lower_limit=lower_limit,upper_limit=upper_limit,resolution=resolution)
 		self.selector = selector
 		self.qd_function = qd_function
-		super().__init__(env=env,genome_constructor=genome_constructor,batch_size=batch_size,seed=seed,logger=logger)
+		super().__init__(env=env,genome_constructor=genome_constructor,batch_size=batch_size,seed=seed)
 		
 	def generate_repertoire(self,num_iterations,save_dir,save_freq,visualise):
 		""" generate a random population initially, generating double the batch_size to increase the probability that
 		 that at least batch_size elements get added"""
-		self.logger.info("Initialising repertoire with random population")
-		for i in range(2*self.batch_size):
-			random_genome = self.genome_constructor(seed=self.seed,logger=self.logger)
-			behavior,quality = self.env.evaluate_quality_diversity_fitness(qd_function=self.qd_function,
-				primitive_genome=random_genome,visualise=visualise)
-			if(self.container.is_high_quality(behavior=behavior,quality=quality)):
-				self.container.add_genome(genome=random_genome,behavior=behavior,quality=quality)
-		self.log_metrics()
+		if(self.current_iteration==1):
+			self.logger.info("Initialising repertoire with random population")
+			for i in range(2*self.batch_size):
+				random_genome = self.genome_constructor(seed=self.seed)
+				behavior,quality = self.env.evaluate_quality_diversity_fitness(qd_function=self.qd_function,
+					primitive_genome=random_genome,visualise=visualise)
+				if(self.container.is_high_quality(behavior=behavior,quality=quality)):
+					self.container.add_genome(genome=random_genome,behavior=behavior,quality=quality)
+			self.log_metrics()
 
-		## to do vary stdev while training based on metrics/ include crossover/ add save load
+		## to do vary stdev while training based on metrics/ include crossover
 		mutation_stdev = 1
-		for iteration in range(num_iterations):
+		for iteration in range(self.current_iteration,self.current_iteration+num_iterations):
 			self.logger.info("Iteration "+str(iteration))
 			parents = self.selector.select(self.container.grid,self.batch_size)
 			"""len(parents) used instead of batch size since it is possible to not have a complete batch from the container"""
@@ -36,6 +38,8 @@ class MAP_Elites(Repertoire_Generator):
 				behavior,quality = self.env.evaluate_quality_diversity_fitness(qd_function=self.qd_function,
 					primitive_genome=child_genome,visualise=visualise)
 				self.logger.debug("parent_curiosity before "+str(parents[i][1]["curiosity"]))
+				
+				### Check if child should be saved into the repertoire and update parent's curiosity score accordingly
 				if(self.container.is_high_quality(behavior=behavior,quality=quality)):
 					"""Note that it is important to update parent before adding child as if done in reverse order then parent might 
 					replace a high quality child showing same behavior"""
@@ -48,18 +52,42 @@ class MAP_Elites(Repertoire_Generator):
 					np.clip(a=parents[i][1]["curiosity"],a_min=self.container.min_curiosity,a_max=np.inf)
 					self.container.update_bin(bin_index=parents[i][0],genome_details=parents[i][1])
 				self.logger.debug("parent_curiosity after "+str(parents[i][1]["curiosity"]))
+			
+			### Log metric and save repertoire
 			self.log_metrics()
+			if(iteration%save_freq==0 and (save_dir is not None)):
+				self.save_repertoire(save_file_path=save_dir+"ant_map_elites_repertoire_"+str(iteration)+".pkl")
+				self.logger.info("Saving repertoire for iteration "+str(iteration)+"\n")
+			self.current_iteration+=1
 
 	def log_metrics(self):
 		self.logger.info("Repertoire Metrics")
 		self.logger.info("Total quality "+str(self.container.total_quality))
 		self.logger.info("Max quality "+str(self.container.max_quality))
 		self.logger.info("Max quality bin "+str(self.container.max_quality_bin))
+		self.logger.info("Min quality "+str(self.container.min_quality))
+		self.logger.info("Min quality bin "+str(self.container.min_quality_bin))
 		self.logger.info("Number of genomes in the container "+str(self.container.num_genomes))
-		self.logger.info("Normalised total quality "+str(self.container.total_quality/self.container.num_genomes))
+		self.logger.info("Mean quality "+str(self.container.total_quality/self.container.num_genomes)+"\n")
 	
-	def save_repertoire(self,save_path):
-		pass
+	def print_metrics(self):
+		print("\nRepertoire Metrics")
+		print("Total quality "+str(self.container.total_quality))
+		print("Max quality "+str(self.container.max_quality))
+		print("Max quality bin "+str(self.container.max_quality_bin))
+		print("Min quality "+str(self.container.min_quality))
+		print("Min quality bin "+str(self.container.min_quality_bin))
+		print("Number of genomes in the container "+str(self.container.num_genomes))
+		print("Mean quality "+str(self.container.total_quality/self.container.num_genomes)+"\n")
+	
+	def save_repertoire(self,save_file_path):
+		os.makedirs(os.path.dirname(save_file_path), exist_ok=True)
+		with open(save_file_path, 'wb') as f:
+			pickle.dump({"container":self.container,"current_iteration":self.current_iteration}, f)
 
-	def load_repertoire(self,load_path):
-		pass
+	def load_repertoire(self,load_file_path):
+		with open(load_file_path,'rb') as f:
+			stored_dict = pickle.load(f)
+			self.container = stored_dict["container"]
+			self.current_iteration = stored_dict["current_iteration"]
+

@@ -1,11 +1,11 @@
 from evo_rbc.genome.ant_genome import AntGenome
 from evo_rbc.env.ant_env import AntEAEnv
-import evo_rbc.test.utils as test_utils
+import evo_rbc.main.utils as test_utils
 
 logger = test_utils.getLogger()
-ant_env = AntEAEnv(logger=logger)
+ant_env = AntEAEnv()
 ant_env.reset()
-ant_genome = AntGenome(logger=logger)
+ant_genome = AntGenome()
 for i in range(5000):
 	if(i%500==0):
 		ant_genome.mutate(4)

@@ -4,10 +4,10 @@ import statistics as stats
 
 class AntEAEnv(EAenv,AntEnv):
 
-	def __init__(self,logger,seed=1,max_time_steps_qd=1000,max_time_steps_task=2000):
+	def __init__(self,seed=1,max_time_steps_qd=1000,max_time_steps_task=2000):
 		AntEnv.__init__(self)
 		self.seed(seed)
-		EAenv.__init__(self,logger=logger,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task)
+		EAenv.__init__(self,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task)
 		self.logger.debug("Created ant environment")
 
 	def evaluate_task_fitness(self,task_funtion,arbitrator_genome,visualise=False):

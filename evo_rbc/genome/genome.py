@@ -1,10 +1,11 @@
-import copy
+import copy,logging
+import evo_rbc.main.utils as utils
 
 class Genome:
 	parameter_space = None
 
-	def __init__(self,logger,parameters=None):
-		self.logger = logger
+	def __init__(self,parameters=None):
+		self.logger = utils.getLogger()
 		if(parameters==None):
 			self.parameters = self.sample_random_genome()
 		else:
@@ -25,14 +26,6 @@ class Genome:
 	def control_function(self,joint_index,time_step):
 		"""Calculate control actions for a particular joint at time step time_step"""
 		raise NotImplementedError
-	
-	def save_genome(self,save_path):
-		"""Saves the genome in save_path"""
-		raise NotImplementedError
-	
-	def load_genome(self,load_path):
-		"""Loads the genome from load_path"""
-		raise NotImplementedError
 
 	def __deepcopy__(self, memo):
 		cls = self.__class__
@@ -45,5 +38,17 @@ class Genome:
 			setattr(result, k, copy.deepcopy(v, memo))
 		return result
 		
+	def __getstate__(self):
+		excluded_subnames = ["logger"]
+		state = {}
+		for k, v in self.__dict__.items():
+			if(k=="logger"):
+				continue
+			state[k] = v
+		return state
 
-		
+	def __setstate__(self, state):
+		for k,v in state.items():
+			self.__dict__[k] = v
+		self.logger = utils.getLogger()
+				

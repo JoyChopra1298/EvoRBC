@@ -4,9 +4,9 @@ import copy
 
 class Grid(Container):
 
-	def __init__(self,num_dimensions,lower_limit,upper_limit,resolution,logger,min_curiosity=0.5,curiosity_multiplier=2):
+	def __init__(self,num_dimensions,lower_limit,upper_limit,resolution,min_curiosity=0.5,curiosity_multiplier=2):
 		"""lower_limit, upper_limit and resolution should be np arrays of shape (num_dimension) to specify them for each dimension"""
-		super().__init__(logger=logger)
+		super().__init__()
 		self.num_dimensions = num_dimensions
 		self.lower_limit = lower_limit
 		self.upper_limit = upper_limit
@@ -46,7 +46,12 @@ class Grid(Container):
 			self.max_quality = quality
 			self.max_quality_bin = bin_index
 			self.logger.debug("new max quality genome found with quality "+str(quality)+" and behavior "+str(behavior))
-		self.update_bin(bin_index,{"genome":genome,"quality":quality,"curiosity":1})
+		if(quality<self.min_quality):
+			self.min_quality = quality
+			self.min_quality_bin = bin_index
+			self.logger.debug("new min quality genome found with quality "+str(quality)+" and behavior "+str(behavior))
+		
+		self.update_bin(bin_index,{"genome":genome,"quality":quality,"curiosity":1.0})
 
 	def update_bin(self,bin_index,genome_details):
 		"""updates the entry in bin. genome details consists of a dictionary of genome parameters"""

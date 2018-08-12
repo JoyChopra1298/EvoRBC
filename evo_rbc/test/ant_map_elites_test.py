@@ -3,7 +3,7 @@ from evo_rbc.genome.ant_genome import AntGenome
 from evo_rbc.env.ant_env import AntEAEnv
 from evo_rbc.qd_solver.container.grid import Grid
 import numpy as np
-import evo_rbc.test.utils as test_utils
+import evo_rbc.main.utils as test_utils
 from evo_rbc.qd_solver.selector.uniform_random_selector import Uniform_Random_Selector
 from evo_rbc.qd_solver.selector.curiosity_driven_selector import Curiosity_Driven_Selector
 
@@ -19,13 +19,12 @@ lower_limit = np.array([-0.5,-0.5])
 upper_limit = np.array([0.5,0.5])
 resolution = np.array([.005,.005])
 
-logger = test_utils.getLogger()
 #initialise environment, genome and repertoire generator
-ant_env = AntEAEnv(seed=seed,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task,logger=logger)
-ant_genome = AntGenome(seed=seed,logger=logger)
+ant_env = AntEAEnv(seed=seed,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task)
+ant_genome = AntGenome(seed=seed)
 map_elites = MAP_Elites(env=ant_env,qd_function=ant_env.qd_steady_runner,genome_constructor=AntGenome,seed=seed,
-	selector=Curiosity_Driven_Selector(logger=logger),num_dimensions=num_dimensions,lower_limit=lower_limit,upper_limit=upper_limit,
-	resolution=resolution,batch_size=batch_size,logger=logger)
+	selector=Curiosity_Driven_Selector(),num_dimensions=num_dimensions,lower_limit=lower_limit,upper_limit=upper_limit,
+	resolution=resolution,batch_size=batch_size)
 
 test_utils.print_heading("Performance and behavior after an evaluation on environment")
 behavior,quality = ant_env.evaluate_quality_diversity_fitness(ant_env.qd_steady_runner,ant_genome,visualise) 
@@ -58,13 +57,13 @@ print("Number of genomes in the container",container.num_genomes)
 print("Normalised total quality ",container.total_quality/container.num_genomes)
 
 test_utils.print_heading("Select samples uniformly from container")
-uniform_random_selector = Uniform_Random_Selector(logger=logger)
+uniform_random_selector = Uniform_Random_Selector()
 sampled_population = uniform_random_selector.select(container.grid,3)
 print(sampled_population)
 print("Sampled genome parameters - smoothness",[genome_details["genome"].parameters["smoothness"] for bin_index,genome_details in sampled_population])
 
 test_utils.print_heading("Select samples based on curiosity scores from container")
-curiosity_driven_selector = Curiosity_Driven_Selector(logger=logger)
+curiosity_driven_selector = Curiosity_Driven_Selector()
 sampled_population = curiosity_driven_selector.select(container.grid,3)
 print(sampled_population)
 print("Sampled genome parameters - smoothness",[genome_details["genome"].parameters["smoothness"] for bin_index,genome_details in sampled_population])
