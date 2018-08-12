@@ -28,12 +28,6 @@ class Container:
 		"""updates the entry in bin. genome details consists of a dictionary of genome parameters"""
 		raise NotImplementedError
 
-	def save_container(self,save_dir):
-		raise NotImplementedError
-
-	def load_container(self,load_path):
-		raise NotImplementedError
-		
 	def __getstate__(self):
 		excluded_subnames = ["logger"]
 		state = {}
