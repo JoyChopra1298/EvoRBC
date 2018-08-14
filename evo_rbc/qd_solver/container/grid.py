@@ -47,18 +47,21 @@ class Grid(Container):
 			self.num_genomes += 1
 
 		if(quality>self.max_quality):
+			self.logger.debug("new max quality genome found with quality "+str(quality)
+				+" and behavior "+str(behavior)+"replacing max quality"+str(self.max_quality))
 			self.max_quality = quality
 			self.max_quality_bin = bin_index
-			self.logger.debug("new max quality genome found with quality "+str(quality)+" and behavior "+str(behavior))
 		if(quality<self.min_quality):
+			self.logger.debug("new min quality genome found with quality "+str(quality)
+				+" and behavior "+str(behavior)+"replacing min quality"+str(self.min_quality))
 			self.min_quality = quality
 			self.min_quality_bin = bin_index
-			self.logger.debug("new min quality genome found with quality "+str(quality)+" and behavior "+str(behavior))
 		
 		self.update_bin(bin_index,{"genome":genome,"quality":quality,"curiosity":1.0})
 
 	def update_bin(self,bin_index,genome_details):
 		"""updates the entry in bin. genome details consists of a dictionary of genome parameters"""
+		self.logger.debug("Updating details for bin "+str(bin_index))
 		self.grid[bin_index] = copy.deepcopy(genome_details)
 
 	def find_min_quality_genome(self):

@@ -53,13 +53,17 @@ class MAP_Elites(Repertoire_Generator):
 					primitive_genome=child_genome,visualise=visualise)
 				self.logger.debug("parent_curiosity before "+str(parents[i][1]["curiosity"]))
 				
+				bin_index = self.container.get_bin(behavior)				
+				self.logger.debug("Child bin index "+str(bin_index))
+				parent_bin_index = parents[i][0]
+				self.logger.debug("Parent bin index "+str(parent_bin_index))
+
 				### Check if child should be saved into the repertoire and update parent's curiosity score accordingly
 				if(self.container.is_high_quality(behavior=behavior,quality=quality)):
 					"""Note that it is important to update parent before adding child as if done in reverse order then parent might 
 					replace a high quality child showing same behavior"""
 					self.logger.debug("Adding child with behavior and quality"+str(behavior)+str(quality))
 					### metrics when child replaces some genome
-					bin_index = self.container.get_bin(behavior)
 					if(bin_index in self.container.grid):
 						old_genome_quality = self.container.grid[bin_index]["quality"]
 						self.logger.debug("Old quality in same bin "+str(old_genome_quality))
@@ -73,7 +77,7 @@ class MAP_Elites(Repertoire_Generator):
 				else:
 					parents[i][1]["curiosity"] /= self.container.curiosity_multiplier
 					np.clip(a=parents[i][1]["curiosity"],a_min=self.container.min_curiosity,a_max=np.inf)
-					self.container.update_bin(bin_index=parents[i][0],genome_details=parents[i][1])
+					self.container.update_bin(bin_index=parent_bin_index,genome_details=parents[i][1])
 				self.logger.debug("parent_curiosity after "+str(parents[i][1]["curiosity"]))
 			
 			## Store metrics

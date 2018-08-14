@@ -46,3 +46,9 @@ class AntEAEnv(EAenv,AntEnv):
 		performance = - (stats.stdev(torso_kinematics["vx"]) + stats.stdev(torso_kinematics["vy"]) + stats.stdev(torso_kinematics["rz"]))
 		self.logger.debug("Evaluation finished with\nbehavior "+str(behavior)+"\nperformance "+str(performance))
 		return (behavior,performance)
+
+	def reset_model(self):
+		qpos = self.init_qpos
+		qvel = self.init_qvel
+		self.set_state(qpos, qvel)
+		return self._get_obs()
