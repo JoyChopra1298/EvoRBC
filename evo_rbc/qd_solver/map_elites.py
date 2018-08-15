@@ -17,7 +17,7 @@ class MAP_Elites(Repertoire_Generator):
 		"total_quality_increase_by_better_genomes":[],
 		"num_new_genomes":[]}
 		
-	def generate_repertoire(self,num_iterations,save_dir,save_freq,visualise):
+	def generate_repertoire(self,num_iterations,save_dir,save_freq,visualise,mutation_stdev=1):
 		""" generate a random population initially, generating double the batch_size to increase the probability that
 		 that at least batch_size elements get added"""
 		if(self.current_iteration==1):
@@ -34,7 +34,6 @@ class MAP_Elites(Repertoire_Generator):
 			self.metrics["num_new_genomes"].append(self.container.num_genomes)
 
 		## to do vary stdev while training based on metrics/ include crossover
-		mutation_stdev = 1
 		for iteration in range(self.current_iteration,self.current_iteration+num_iterations):
 			self.logger.info("Iteration "+str(iteration))
 			parents = self.selector.select(self.container.grid,self.batch_size)
@@ -76,7 +75,7 @@ class MAP_Elites(Repertoire_Generator):
 
 				else:
 					parents[i][1]["curiosity"] /= self.container.curiosity_multiplier
-					np.clip(a=parents[i][1]["curiosity"],a_min=self.container.min_curiosity,a_max=np.inf)
+					parents[i][1]["curiosity"] = np.clip(a=parents[i][1]["curiosity"],a_min=self.container.min_curiosity,a_max=np.inf)
 					self.container.update_bin(bin_index=parent_bin_index,genome_details=parents[i][1])
 				self.logger.debug("parent_curiosity after "+str(parents[i][1]["curiosity"]))
 			

@@ -17,6 +17,8 @@ def play(bin_index):
 
 behavior = map_elites.container.min_quality_bin
 play((61,53))
+play((61,53))
+play((61,53))
 
 # map_elites.print_metrics()
 # print(sum(map_elites.metrics["total_quality_increase_by_better_genomes"]))

@@ -18,9 +18,9 @@ visualise = False
 
 #Grid details
 num_dimensions = 2
-lower_limit = np.array([-0.25,-0.25])
-upper_limit = np.array([0.25,0.25])
-resolution = np.array([.005,.005])
+lower_limit = np.array([-0.2,-0.2])
+upper_limit = np.array([0.2,0.2])
+resolution = np.array([.0125,.0125])
 
 
 #initialise environment, genome and repertoire generator
