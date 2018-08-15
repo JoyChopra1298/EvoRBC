@@ -48,7 +48,6 @@ class Grid(Container):
 			self.num_genomes += 1
 			self.update_bin(bin_index,{"genome":genome,"quality":quality,"curiosity":1.0})
 
-
 		if(quality>self.max_quality):
 			self.logger.debug("new max quality genome found with quality "+str(quality)
 				+" and behavior "+str(behavior)+"replacing max quality"+str(self.max_quality))
@@ -59,7 +58,6 @@ class Grid(Container):
 				+" and behavior "+str(behavior)+"replacing min quality"+str(self.min_quality))
 			self.min_quality = quality
 			self.min_quality_bin = bin_index
-		
 
 	def update_bin(self,bin_index,genome_details):
 		"""updates the entry in bin. genome details consists of a dictionary of genome parameters"""
@@ -72,3 +70,12 @@ class Grid(Container):
 			if(genome_details["quality"]<self.min_quality):
 				self.min_quality = genome_details["quality"]
 				self.min_quality_bin = bin_index
+
+	def get_metrics(self):
+		return {"Total Quality":self.total_quality,
+		"Max Quality":self.max_quality,
+		"Max Quality Bin":self.max_quality_bin,
+		"Min Quality":self.min_quality,
+		"Min Quality Bin":self.min_quality_bin,
+		"Number of genomes":self.num_genomes,
+		"Mean quality":self.total_quality/self.num_genomes}

@@ -15,7 +15,7 @@ class MAP_Elites(Repertoire_Generator):
 		## metrics to measure growth for each iteration
 		self.metrics = {"num_better_genome_found":[],
 		"total_quality_increase_by_better_genomes":[],
-		"num_new_genomes":[]}
+		"num_new_genomes":[],"container_metrics":[]}
 		
 	def generate_repertoire(self,num_iterations,save_dir,save_freq,visualise,mutation_stdev=1):
 		""" generate a random population initially, generating double the batch_size to increase the probability that
@@ -43,6 +43,7 @@ class MAP_Elites(Repertoire_Generator):
 			total_quality_increase_by_better_genomes_in_this_iteration = 0
 			old_num_genomes = self.container.num_genomes
 
+			#### paralellise this loop just like pi example
 			"""len(parents) used instead of batch size since it is possible to not have a complete batch from the container"""
 			for i in range(len(parents)):
 				parent_genome = parents[i][1]["genome"]
@@ -83,6 +84,7 @@ class MAP_Elites(Repertoire_Generator):
 			self.metrics["num_better_genome_found"].append(num_better_genome_found_in_this_iteration)
 			self.metrics["total_quality_increase_by_better_genomes"].append(total_quality_increase_by_better_genomes_in_this_iteration)
 			self.metrics["num_new_genomes"].append(self.container.num_genomes - old_num_genomes)
+			self.metrics["container_metrics"].append(self.container.get_metrics())
 			
 			### Log metrics 
 			self.log_metrics()
@@ -101,23 +103,15 @@ class MAP_Elites(Repertoire_Generator):
 
 	def log_metrics(self):
 		self.logger.info("Repertoire Metrics")
-		self.logger.info("Total quality "+str(self.container.total_quality))
-		self.logger.info("Max quality "+str(self.container.max_quality))
-		self.logger.info("Max quality bin "+str(self.container.max_quality_bin))
-		self.logger.info("Min quality "+str(self.container.min_quality))
-		self.logger.info("Min quality bin "+str(self.container.min_quality_bin))
-		self.logger.info("Number of genomes in the container "+str(self.container.num_genomes))
-		self.logger.info("Mean quality "+str(self.container.total_quality/self.container.num_genomes)+"\n")
-	
+		for key,value in self.container.get_metrics().items():
+			self.logger.info(key+" "+str(value))
+		self.logger.info("")
+
 	def print_metrics(self):
 		print("\nRepertoire Metrics")
-		print("Total quality "+str(self.container.total_quality))
-		print("Max quality "+str(self.container.max_quality))
-		print("Max quality bin "+str(self.container.max_quality_bin))
-		print("Min quality "+str(self.container.min_quality))
-		print("Min quality bin "+str(self.container.min_quality_bin))
-		print("Number of genomes in the container "+str(self.container.num_genomes))
-		print("Mean quality "+str(self.container.total_quality/self.container.num_genomes)+"\n")
+		for key,value in self.container.get_metrics().items():
+			print(key+" "+str(value))
+		print("")
 	
 	def save_repertoire(self,save_file_path):
 		os.makedirs(os.path.dirname(save_file_path), exist_ok=True)
