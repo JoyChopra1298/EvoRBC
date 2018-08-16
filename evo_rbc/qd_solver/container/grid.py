@@ -38,10 +38,10 @@ class Grid(Container):
 		bin_index = self.get_bin(behavior)
 		if(bin_index in self.grid):
 			self.total_quality += quality - self.grid[bin_index]["quality"]
+			self.update_bin(bin_index,{"genome":genome,"quality":quality,"curiosity":1.0})
 			if(bin_index==self.min_quality_bin):
 				self.logger.debug("found better quality for current minima. updating min quality genome.")
 				self.min_quality = quality
-				self.update_bin(bin_index,{"genome":genome,"quality":quality,"curiosity":1.0})
 				self.find_min_quality_genome()
 		else:
 			self.total_quality += quality
