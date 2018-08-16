@@ -4,7 +4,7 @@ import evo_rbc.main.utils as test_utils
 ant_genome = AntGenome()
 
 control_duration = 10
-num_generations = 0
+num_generations = 1
 joint_index = 1
 
 test_utils.print_heading("Parameter space")

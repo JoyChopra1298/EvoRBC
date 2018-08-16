@@ -125,3 +125,5 @@ class MAP_Elites(Repertoire_Generator):
 			self.current_iteration = stored_dict["current_iteration"]
 			self.metrics = stored_dict["metrics"]
 
+	def parallel_evaluate(self,genome):
+		"""send the genome for evaluation to any worker that is free and return the resultant behavior,quality"""
