@@ -12,7 +12,7 @@ def main(num_iterations,save_freq,visualise,load_path):
 	map_elites = get_MAPElites()
 	if(load_path is not None):
 		map_elites.load_repertoire(load_path)
-	map_elites.generate_repertoire(num_iterations=num_iterations,save_dir=save_dir,save_freq=save_freq,visualise=visualise,mutation_stdev=2)
+	map_elites.generate_repertoire(num_iterations=num_iterations,save_dir=save_dir,save_freq=save_freq,visualise=visualise,mutation_stdev=0.01,num_processes=3)
 
 if __name__ == "__main__":
 	main()

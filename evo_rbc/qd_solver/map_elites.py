@@ -3,6 +3,8 @@ from .container.grid import Grid
 import copy,os
 import numpy as np
 import pickle
+from mpi4py import MPI
+import sys
 
 class MAP_Elites(Repertoire_Generator):
 
@@ -17,7 +19,7 @@ class MAP_Elites(Repertoire_Generator):
 		"total_quality_increase_by_better_genomes":[],
 		"num_new_genomes":[],"container_metrics":[]}
 		
-	def generate_repertoire(self,num_iterations,save_dir,save_freq,visualise,mutation_stdev=1):
+	def generate_repertoire(self,num_iterations,save_dir,save_freq,visualise,mutation_stdev=0.01,num_processes=1):
 		""" generate a random population initially, generating double the batch_size to increase the probability that
 		 that at least batch_size elements get added"""
 		if(self.current_iteration==1):
@@ -38,19 +40,42 @@ class MAP_Elites(Repertoire_Generator):
 			self.logger.info("Iteration "+str(iteration))
 			parents = self.selector.select(self.container.grid,self.batch_size)
 			
+			parents_len = len(parents)
+			"""len(parents) used instead of batch size since it is possible to not have a complete batch from the container"""
+			children_genomes = []
+			for i in range(parents_len):
+				parent_genome = parents[i][1]["genome"]
+				child_genome = copy.deepcopy(parent_genome)
+				child_genome.mutate(sigma=mutation_stdev)
+				children_genomes.append(child_genome)
+
+			comm = MPI.COMM_SELF.Spawn(sys.executable,
+									   args=['../../mpi_worker/evaluation_worker.py'],
+									   maxprocs=num_processes)
+			step = int(parents_len/num_processes)
+
+			children_genomes_matrix = [children_genomes[i*step:(i+1)*step] for i in range(0,num_processes)]
+
+			for i in range(parents_len%num_processes):
+				children_genomes_matrix[i].append(children_genomes[(num_processes*step)+i])
+
+			children_genome = comm.scatter(children_genomes_matrix,root=MPI.ROOT)
+			visualise = comm.bcast(visualise,root=MPI.ROOT)
+
+			qd_evaluations = None
+			qd_evaluations = comm.gather(qd_evaluations,root=MPI.ROOT)
+
+			print(qd_evaluations)
+			comm.Disconnect()
+
+
 			## initialise metrics for current iteration
 			num_better_genome_found_in_this_iteration = 0
 			total_quality_increase_by_better_genomes_in_this_iteration = 0
 			old_num_genomes = self.container.num_genomes
 
-			#### paralellise this loop just like pi example
-			"""len(parents) used instead of batch size since it is possible to not have a complete batch from the container"""
 			for i in range(len(parents)):
-				parent_genome = parents[i][1]["genome"]
-				child_genome = copy.deepcopy(parent_genome)
-				child_genome.mutate(sigma=mutation_stdev)
-				behavior,quality = self.env.evaluate_quality_diversity_fitness(qd_function=self.qd_function,
-					primitive_genome=child_genome,visualise=visualise)
+				behavior,quality = qd_evaluations[i%num_processes][int(i/num_processes)]
 				self.logger.debug("parent_curiosity before "+str(parents[i][1]["curiosity"]))
 				
 				bin_index = self.container.get_bin(behavior)				
@@ -125,5 +150,5 @@ class MAP_Elites(Repertoire_Generator):
 			self.current_iteration = stored_dict["current_iteration"]
 			self.metrics = stored_dict["metrics"]
 
-	def parallel_evaluate(self,genome):
+	def parallel_evaluate(self,genomes,num_processes):
 		"""send the genome for evaluation to any worker that is free and return the resultant behavior,quality"""

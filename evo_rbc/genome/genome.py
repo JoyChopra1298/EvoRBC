@@ -18,7 +18,7 @@ class Genome:
 		np.random.seed(seed=seed)
 		# self.logger.debug("Created random genome"+str(self.parameters))
 	
-	def mutate(self,sigma=1):
+	def mutate(self,sigma=0.01):
 		"""Mutate the genome using a truncated gaussian"""
 		# self.logger.debug("Mutating genome. Current parameters - "+str(self.parameters))
 		for key,value in self.parameters.items():
