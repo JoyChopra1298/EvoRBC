@@ -1,0 +1,28 @@
+seed = 1
+batch_size = 100
+max_time_steps_qd=1000
+max_time_steps_task=2000
+visualise = False
+
+#Grid details
+num_dimensions = 2
+lower_limit = np.array([-0.25,-0.25])
+upper_limit = np.array([0.25,0.25])
+resolution = np.array([.005,.005])
+
+sigma = 1
+
+amplitude_low = -0.5
+amplitude_high = 0.5
+phase_low = 0
+phase_high = 1
+smoothness_low = (np.pi)/4
+smoothness_high = (np.pi/4) + 2*(np.pi)
+epsilon_low = -0.5
+epsilon_high = 0.5
+# on exponential scale, example -1 would mean 1e-1
+control_frequency_low = -3.0 
+control_frequency_high = -1.0
+
+behavior = (stats.mean(torso_kinematics["vx"]),stats.mean(torso_kinematics["vy"]))
+performance = - (stats.stdev(torso_kinematics["vx"]) + stats.stdev(torso_kinematics["vy"]) + stats.stdev(torso_kinematics["rz"]))

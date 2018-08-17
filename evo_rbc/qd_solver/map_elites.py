@@ -24,12 +24,16 @@ class MAP_Elites(Repertoire_Generator):
 		 that at least batch_size elements get added"""
 		if(self.current_iteration==1):
 			self.logger.info("Initialising repertoire with random population")
+			random_genomes = []
 			for i in range(2*self.batch_size):
-				random_genome = self.genome_constructor(seed=self.seed)
-				behavior,quality = self.env.evaluate_quality_diversity_fitness(qd_function=self.qd_function,
-					primitive_genome=random_genome,visualise=visualise)
+				random_genomes.append(self.genome_constructor(seed=self.seed))
+
+			qd_evaluations = self.parallel_evaluate(genomes=random_genomes,num_processes=num_processes,visualise=visualise)
+
+			for i in range(2*self.batch_size):
+				behavior,quality = qd_evaluations[i%num_processes][int(i/num_processes)]
 				if(self.container.is_high_quality(behavior=behavior,quality=quality)):
-					self.container.add_genome(genome=random_genome,behavior=behavior,quality=quality)
+					self.container.add_genome(genome=random_genomes[i],behavior=behavior,quality=quality)
 			self.log_metrics()
 			self.metrics["num_better_genome_found"].append(0)
 			self.metrics["total_quality_increase_by_better_genomes"].append(0)
@@ -49,25 +53,7 @@ class MAP_Elites(Repertoire_Generator):
 				child_genome.mutate(sigma=mutation_stdev)
 				children_genomes.append(child_genome)
 
-			comm = MPI.COMM_SELF.Spawn(sys.executable,
-									   args=['../../mpi_worker/evaluation_worker.py'],
-									   maxprocs=num_processes)
-			step = int(parents_len/num_processes)
-
-			children_genomes_matrix = [children_genomes[i*step:(i+1)*step] for i in range(0,num_processes)]
-
-			for i in range(parents_len%num_processes):
-				children_genomes_matrix[i].append(children_genomes[(num_processes*step)+i])
-
-			children_genome = comm.scatter(children_genomes_matrix,root=MPI.ROOT)
-			visualise = comm.bcast(visualise,root=MPI.ROOT)
-
-			qd_evaluations = None
-			qd_evaluations = comm.gather(qd_evaluations,root=MPI.ROOT)
-
-			print(qd_evaluations)
-			comm.Disconnect()
-
+			qd_evaluations = self.parallel_evaluate(genomes=children_genomes,num_processes=num_processes,visualise=visualise)
 
 			## initialise metrics for current iteration
 			num_better_genome_found_in_this_iteration = 0
@@ -75,6 +61,7 @@ class MAP_Elites(Repertoire_Generator):
 			old_num_genomes = self.container.num_genomes
 
 			for i in range(len(parents)):
+				child_genome = children_genomes[i]
 				behavior,quality = qd_evaluations[i%num_processes][int(i/num_processes)]
 				self.logger.debug("parent_curiosity before "+str(parents[i][1]["curiosity"]))
 				
@@ -150,5 +137,25 @@ class MAP_Elites(Repertoire_Generator):
 			self.current_iteration = stored_dict["current_iteration"]
 			self.metrics = stored_dict["metrics"]
 
-	def parallel_evaluate(self,genomes,num_processes):
+	def parallel_evaluate(self,genomes,visualise,num_processes):
 		"""send the genome for evaluation to any worker that is free and return the resultant behavior,quality"""
+		comm = MPI.COMM_SELF.Spawn(sys.executable,
+									   args=['../../mpi_worker/evaluation_worker.py'],
+									   maxprocs=num_processes)
+		genomes_len = len(genomes)
+		step = int(genomes_len/num_processes)
+
+		genomes_matrix = [genomes[i*step:(i+1)*step] for i in range(0,num_processes)]
+
+		for i in range(genomes_len%num_processes):
+			genomes_matrix[i].append(genomes[(num_processes*step)+i])
+
+		genome = comm.scatter(genomes_matrix,root=MPI.ROOT)
+		visualise = comm.bcast(visualise,root=MPI.ROOT)
+
+		qd_evaluations = None
+		qd_evaluations = comm.gather(qd_evaluations,root=MPI.ROOT)
+
+		comm.Disconnect()
+		
+		return qd_evaluations
