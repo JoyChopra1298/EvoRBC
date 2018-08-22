@@ -165,9 +165,11 @@ class MAP_Elites(Repertoire_Generator):
 		"""Show the metrics as plot"""
 		if(secondary_metric_key):
 			metric_list = [self.metrics[metric_key][i][secondary_metric_key] for i in range(len(self.metrics[metric_key]))]
+			ylabel = metric_key+" "+str(secondary_metric_key) 
 		else:
 			metric_list = self.metrics[metric_key]
+			ylabel = metric_key
 		plt.plot([i+1 for i in range(len(metric_list))],metric_list)
-		plt.ylabel('Iteration number')
-		plt.ylabel(metric_key+" "+str(secondary_metric_key))
+		plt.xlabel('Iteration number')
+		plt.ylabel(ylabel)
 		plt.show()
