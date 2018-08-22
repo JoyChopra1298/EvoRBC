@@ -23,8 +23,7 @@ visualise = comm.bcast(visualise,root=0)
 qd_evaluations = []
 for i in range(len(genomes)):
 	behavior,quality = env.evaluate_quality_diversity_fitness(qd_function=qd_function,primitive_genome=genomes[i],visualise=visualise)
-	bin_index = map_elites.container.get_bin(behavior)
-	logger.debug(str((rank,behavior,bin_index,quality)))
+	logger.debug(str((rank,behavior,quality)))
 	qd_evaluations.append((behavior,quality))
 	# print("rank",rank,"i",i,"control freq",genomes[i].parameters["control_frequency"],bin_index)
 
