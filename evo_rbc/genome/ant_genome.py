@@ -16,8 +16,8 @@ class AntGenome(Genome):
 	epsilon_low = -0.5
 	epsilon_high = 0.5
 	# on exponential scale, example -1 would mean 1e-1
-	control_frequency_low = -3.0 
-	control_frequency_high = -1.0
+	control_frequency_low = -2.5 
+	control_frequency_high = -1.5
 
 	num_joints = 8
 	parameter_space = spaces.Dict({
