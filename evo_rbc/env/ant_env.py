@@ -8,7 +8,7 @@ class AntEAEnv(EAenv,AntEnv):
 		AntEnv.__init__(self)
 		self.seed(seed)
 		EAenv.__init__(self,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task)
-		self.logger.debug("Created ant environment")
+		# self.logger.debug("Created ant environment")
 
 	def evaluate_task_fitness(self,task_funtion,arbitrator_genome,visualise=False):
 		raise NotImplementedError
@@ -38,7 +38,6 @@ class AntEAEnv(EAenv,AntEnv):
 				torso_kinematics["vx"].append(velocity_vector[0])
 				torso_kinematics["vy"].append(velocity_vector[1])
 				torso_kinematics["rz"].append(position_vector[2])
-
 		""" since dividing behavior into bins depends on container so just return a tuple (mean_vx,mean_vy) for behavior from env
 		also they are not attributes of genome like genome.behavior, genome.performance since can have various fitness func 
 		although then could use a dictionary"""

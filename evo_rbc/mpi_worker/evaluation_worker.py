@@ -8,25 +8,28 @@ comm = MPI.Comm.Get_parent()
 size = comm.Get_size()
 rank = comm.Get_rank()
 
-env = AntEAEnv(max_time_steps_qd=1000)
+genomes_matrix = visualise = max_time_steps_qd =None
+
+max_time_steps_qd = comm.bcast(max_time_steps_qd,root=0)
+env = AntEAEnv(max_time_steps_qd=max_time_steps_qd)
 qd_function = env.qd_steady_runner
 
 # print("child spawned and running",rank)
-genomes_matrix = visualise = None
 
 genomes = comm.scatter(genomes_matrix,root=0)
 
 visualise = comm.bcast(visualise,root=0)
 # print("visualise",visualise,rank)
 qd_evaluations = []
-for genome in genomes:
-	behavior,quality = env.evaluate_quality_diversity_fitness(qd_function=qd_function,primitive_genome=genome,visualise=visualise)
-	logger.debug(str((rank,behavior,quality)))
+for i in range(len(genomes)):
+	behavior,quality = env.evaluate_quality_diversity_fitness(qd_function=qd_function,primitive_genome=genomes[i],visualise=visualise)
+	bin_index = map_elites.container.get_bin(behavior)
+	logger.debug(str((rank,behavior,bin_index,quality)))
 	qd_evaluations.append((behavior,quality))
+	# print("rank",rank,"i",i,"control freq",genomes[i].parameters["control_frequency"],bin_index)
 
-# for i in range(len(genomes)):
-# 	print("rank",rank,"i",i,"control freq",genomes[i].parameters["control_frequency"])
 # print(rank,qd_evaluations)
+
 qd_evaluations = comm.gather(qd_evaluations,root=0)
 
 

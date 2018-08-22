@@ -30,7 +30,7 @@ class MAP_Elites(Repertoire_Generator):
 
 			qd_evaluations = self.parallel_evaluate(genomes=random_genomes,num_processes=num_processes,visualise=visualise)
 
-			for i in range(2*self.batch_size):
+			for i in range(len(random_genomes)):
 				behavior,quality = qd_evaluations[i%num_processes][int(i/num_processes)]
 				if(self.container.is_high_quality(behavior=behavior,quality=quality)):
 					self.container.add_genome(genome=random_genomes[i],behavior=behavior,quality=quality)
@@ -143,13 +143,13 @@ class MAP_Elites(Repertoire_Generator):
 									   args=['../../mpi_worker/evaluation_worker.py'],
 									   maxprocs=num_processes)
 		genomes_len = len(genomes)
-		step = int(genomes_len/num_processes)
 
 		genomes_matrix = [[] for i in range(num_processes)]
 
 		for i in range(genomes_len):
 			genomes_matrix[i%num_processes].append(genomes[i])
 
+		max_time_steps_qd = comm.bcast(self.env.max_time_steps_qd,root=MPI.ROOT)
 		genome = comm.scatter(genomes_matrix,root=MPI.ROOT)
 		visualise = comm.bcast(visualise,root=MPI.ROOT)
 

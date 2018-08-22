@@ -9,6 +9,7 @@ logger = test_utils.getLogger()
 
 genome = AntGenome()
 visualise = False
+max_time_steps_qd = 1000
 
 genomes = []
 num_processes = 3
@@ -23,13 +24,13 @@ comm = MPI.COMM_SELF.Spawn(sys.executable,
                            maxprocs=num_processes)
 
 genomes_len = len(genomes)
-step = int(genomes_len/num_processes)
 
 genomes_matrix = [[] for i in range(num_processes)]
 
 for i in range(genomes_len):
 	genomes_matrix[i%num_processes].append(genomes[i])
 
+max_time_steps_qd = comm.bcast(max_time_steps_qd,root=MPI.ROOT)
 genome = comm.scatter(genomes_matrix,root=MPI.ROOT)
 visualise = comm.bcast(visualise,root=MPI.ROOT)
 
@@ -37,7 +38,7 @@ qd_evaluations = None
 qd_evaluations = comm.gather(qd_evaluations,root=MPI.ROOT)
 
 for i in range(len(genomes)):
-	# print("--",qd_evaluations[i%num_processes][int(i/num_processes)],i%num_processes,int(i/num_processes))
+	print("--",qd_evaluations[i%num_processes][int(i/num_processes)],i%num_processes,int(i/num_processes))
 	print("--",genomes[i].parameters["control_frequency"],i,i%num_processes,int(i/num_processes))
 
 comm.Disconnect()
