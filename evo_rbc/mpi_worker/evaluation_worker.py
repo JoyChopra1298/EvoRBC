@@ -24,8 +24,8 @@ for genome in genomes:
 	logger.debug(str((rank,behavior,quality)))
 	qd_evaluations.append((behavior,quality))
 
-for i in range(len(genomes)):
-	print("rank",rank,"i",i,"control freq",genomes[i].parameters["control_frequency"])
+# for i in range(len(genomes)):
+# 	print("rank",rank,"i",i,"control freq",genomes[i].parameters["control_frequency"])
 # print(rank,qd_evaluations)
 qd_evaluations = comm.gather(qd_evaluations,root=0)
 
