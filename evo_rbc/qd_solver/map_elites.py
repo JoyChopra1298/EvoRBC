@@ -5,6 +5,7 @@ import numpy as np
 import pickle
 from mpi4py import MPI
 import sys
+import matplotlib.pyplot as plt
 
 class MAP_Elites(Repertoire_Generator):
 
@@ -159,3 +160,14 @@ class MAP_Elites(Repertoire_Generator):
 		comm.Disconnect()
 		
 		return qd_evaluations
+
+	def view_metrics(self,metric_key,secondary_metric_key=None):
+		"""Show the metrics as plot"""
+		if(secondary_metric_key):
+			metric_list = self.metrics[metric_key][secondary_metric_key]
+		else:
+			metric_list = self.metrics[metric_key]
+		plt.plot([i+1 for i in range(len(metric_list))],metric_list)
+		plt.ylabel('Iteration number')
+		plt.ylabel(metric_key+str(secondary_metric_key))
+		plt.show()
