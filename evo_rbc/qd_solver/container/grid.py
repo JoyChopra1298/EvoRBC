@@ -58,11 +58,12 @@ class Grid(Container):
 				+" and behavior "+str(behavior)+"replacing min quality"+str(self.min_quality))
 			self.min_quality = quality
 			self.min_quality_bin = bin_index
+		self.logger.debug("new genome added -- quality "+str(quality)+"bin quality "+str(slef.grid[bin_index]["quality"]))
 
 	def update_bin(self,bin_index,genome_details):
 		"""updates the entry in bin. genome details consists of a dictionary of genome parameters"""
-		self.logger.debug("Updating details for bin "+str(bin_index))
 		self.grid[bin_index] = copy.deepcopy(genome_details)
+		self.logger.debug("Updating details for bin "+str(bin_index))
 
 	def find_min_quality_genome(self):
 		### since this is rare so iterating whole container for now. need better data structure

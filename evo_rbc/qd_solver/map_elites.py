@@ -145,10 +145,10 @@ class MAP_Elites(Repertoire_Generator):
 		genomes_len = len(genomes)
 		step = int(genomes_len/num_processes)
 
-		genomes_matrix = [genomes[i*step:(i+1)*step] for i in range(0,num_processes)]
+		genomes_matrix = [[] for i in range(num_processes)]
 
-		for i in range(genomes_len%num_processes):
-			genomes_matrix[i].append(genomes[(num_processes*step)+i])
+		for i in range(genomes_len):
+			genomes_matrix[i%num_processes].append(genomes[i])
 
 		genome = comm.scatter(genomes_matrix,root=MPI.ROOT)
 		visualise = comm.bcast(visualise,root=MPI.ROOT)
