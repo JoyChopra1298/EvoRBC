@@ -1,8 +1,6 @@
 from .genome import Genome
 import gym.spaces as spaces
 import numpy as np 
-from collections import OrderedDict
-from scipy.stats import truncnorm
 
 class AntGenome(Genome):
 	#for each joint(2 for each leg, total 4*2 = 8). control function specific
@@ -19,6 +17,7 @@ class AntGenome(Genome):
 	control_frequency_low = -2.5 
 	control_frequency_high = -1.5
 
+	action_limits = [-1,1]
 	num_joints = 8
 	parameter_space = spaces.Dict({
 		"amplitude_space":spaces.Box(low=amplitude_low,high=amplitude_high,shape=(num_joints,1),dtype=np.float32),

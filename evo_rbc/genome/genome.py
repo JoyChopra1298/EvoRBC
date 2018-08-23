@@ -3,6 +3,7 @@ import evo_rbc.main.utils as utils
 import numpy as np 
 from collections import OrderedDict
 from scipy.stats import truncnorm
+import matplotlib.pyplot as plt
 
 class Genome:
 	parameter_space = None
@@ -46,6 +47,20 @@ class Genome:
 
 		# Remove trailing "_space" from keys since returning parameters for a single genome
 		return OrderedDict([(key[:-6],value) for key,value in ordered_dict.items()])
+
+	def control_function(self,time_step,**kwargs):
+		raise NotImplementedError
+
+	def plot_control_function(self,num_timesteps,**kwargs):
+		"""Plot the control function of the genome for specified number of time steps"""
+		control_values = []
+		for i in range(num_timesteps):
+			control_values.append(self.control_function(time_step=i+1,**kwargs))
+		plt.plot([i+1 for i in range(num_timesteps)],control_values)
+		plt.xlabel('Time step')
+		plt.ylabel('Control value')
+		plt.ylim(self.action_limits)
+		plt.show()
 
 	def __deepcopy__(self, memo):
 		cls = self.__class__

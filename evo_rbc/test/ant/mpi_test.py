@@ -20,7 +20,7 @@ for i in range(num_processes*2+2):
 	genomes.append(genome_i)	
 
 comm = MPI.COMM_SELF.Spawn(sys.executable,
-                           args=['../mpi_worker/evaluation_worker.py'],
+                           args=['../../mpi_worker/evaluation_worker.py'],
                            maxprocs=num_processes)
 
 genomes_len = len(genomes)

@@ -35,5 +35,4 @@ test_utils.print_heading("Child Genome")
 child_genome = ant_genome.crossover(ant_genome_2)
 print(child_genome.parameters)
 
-
-
+child_genome.plot_control_function(num_timesteps=100,joint_index=1)
