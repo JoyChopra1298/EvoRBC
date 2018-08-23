@@ -1,6 +1,18 @@
 # EvoRBC
 EvoRBC implementation for OpenAI Gym environments
 
+## References
+1. [Illuminating search spaces by mapping elites (MAP-Elites)](https://arxiv.org/pdf/1504.04909.pdf)
+2. [Evolution of Repertoire-Based Control for Robots With Complex Locomotor Systems (EVO-RBC)](https://sci-hub.tw/https://ieeexplore.ieee.org/abstract/document/7964759/)
+3. [Evolving Neural Networks through Augmenting Topologies (NEAT)](http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf)
+4. [Muscle contributions to fore-aft and vertical body mass center accelerations over a range of running speeds](http://nmbl.stanford.edu/publications/pdf/Hamner2012.pdf)
+
+Ant observations/todos after 3rd repo
+1. some legs still don't move in a few gaits, maybe increase control freq range but then can't stay still.... (maybe penalise this.. difference in leg speed)
+2. the topmost speed isn't fast enough could increase the range
+3. evolved behaviors are good.
+4. since things have saturated and mutation isn't leading anywhere great, should start including crossover
+
 ## EvoRBC high level architechture
 ![image](https://user-images.githubusercontent.com/27682820/43711887-db0a86ba-9991-11e8-97f2-a65152e7a6e4.png)
 
@@ -19,3 +31,5 @@ In the ant implementation, frequency is also taken as variable parameter since i
 
 ## Control for muscles human
 ![image](https://user-images.githubusercontent.com/14030793/43922915-c8b9fa3c-9c3d-11e8-852e-98abb60eaa2e.png)
+
+
