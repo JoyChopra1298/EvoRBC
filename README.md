@@ -25,3 +25,9 @@ In the ant implementation, frequency is also taken as variable parameter since i
 
 ## Control for muscles human
 ![image](https://user-images.githubusercontent.com/14030793/43922915-c8b9fa3c-9c3d-11e8-852e-98abb60eaa2e.png)
+
+
+## References
+1. [Illuminating search spaces by mapping elites (MAP-Elites)](https://arxiv.org/pdf/1504.04909.pdf)
+2. [Evolution of Repertoire-Based Control for Robots With Complex Locomotor Systems (EVO-RBC)](https://sci-hub.tw/https://ieeexplore.ieee.org/abstract/document/7964759/)
+3. [Evolving Neural Networks through Augmenting Topologies (NEAT)](http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf)
