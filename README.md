@@ -1,6 +1,11 @@
 # EvoRBC
 EvoRBC implementation for OpenAI Gym environments
 
+Ant observations/todos after 3rd repo
+1. some legs still don't move in a few gaits, maybe increase control freq range but then can't stay still.... (maybe penalise this.. difference in leg speed)
+2. the topmost speed isn't fast enough could increase the range
+3. evolved behaviors are good.
+
 ## EvoRBC high level architechture
 ![image](https://user-images.githubusercontent.com/27682820/43711887-db0a86ba-9991-11e8-97f2-a65152e7a6e4.png)
 
