@@ -29,7 +29,7 @@ In the ant implementation, frequency is also taken as variable parameter since i
 ## Regarding cross over in map elites according to the paper
 ![image](https://user-images.githubusercontent.com/27682820/43890083-6a89cf1e-9be3-11e8-9f75-abb636838c3f.png)
 
-## Control for muscles human
+## Activation and excitation for muscles - human
 ![image](https://user-images.githubusercontent.com/14030793/43922915-c8b9fa3c-9c3d-11e8-852e-98abb60eaa2e.png)
 
 
