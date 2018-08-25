@@ -110,7 +110,7 @@ class MAP_Elites(Repertoire_Generator):
 			
 			## Save repertoire
 			if(iteration%save_freq==0 and (save_dir is not None)):
-				self.save_repertoire(save_file_path=save_dir+"ant_map_elites_repertoire_"+str(iteration)+".pkl")
+				self.save_repertoire(save_file_path=save_dir+"map_elites_repertoire_"+str(iteration)+".pkl")
 				self.logger.info("Saving repertoire for iteration "+str(iteration)+"\n")
 			self.current_iteration+=1
 
@@ -141,7 +141,7 @@ class MAP_Elites(Repertoire_Generator):
 	def parallel_evaluate(self,genomes,visualise,num_processes):
 		"""send the genome for evaluation to any worker that is free and return the resultant behavior,quality"""
 		comm = MPI.COMM_SELF.Spawn(sys.executable,
-									   args=['../../mpi_worker/evaluation_worker.py'],
+									   args=[self.env.mpi_worker_path],
 									   maxprocs=num_processes)
 		genomes_len = len(genomes)
 

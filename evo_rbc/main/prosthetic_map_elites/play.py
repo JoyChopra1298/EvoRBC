@@ -19,29 +19,3 @@ behavior = map_elites.container.min_quality_bin
 
 play((31,15))
 # map_elites.view_metrics("num_new_genomes")
-
-
-# map_elites.print_metrics()
-# print(sum(map_elites.metrics["total_quality_increase_by_better_genomes"]))
-# print(map_elites.metrics)
-
-'''repo2
-good/ok
-31,31
-25,15
-31,16
-16,28
-1,28
-1,1
-bad
-30,30
-1,30
-1,29
-'''
-
-##repo1
-#30,30
-#64,0
-#23,34
-#22,35
-#99,50

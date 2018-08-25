@@ -8,8 +8,8 @@ def print_heading(heading):
 save_dir = "output/"
 os.makedirs(os.path.dirname(save_dir), exist_ok=True)
 
-debug_logfile = save_dir+"ant_map_elites_debug.log"
-logfile = save_dir+"ant_map_elites.log"
+debug_logfile = save_dir+"map_elites_debug.log"
+logfile = save_dir+"map_elites.log"
 
 # define a Handler which writes INFO messages or higher to the sys.stderr
 console_handler = logging.StreamHandler()

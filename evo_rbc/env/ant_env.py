@@ -8,6 +8,7 @@ class AntEAEnv(EAenv,AntEnv):
 		AntEnv.__init__(self)
 		self.seed(seed)
 		EAenv.__init__(self,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task)
+		self.mpi_worker_path = '../../mpi_worker/ant_evaluation_worker.py'
 		# self.logger.debug("Created ant environment")
 
 	def evaluate_task_fitness(self,task_funtion,arbitrator_genome,visualise=False):

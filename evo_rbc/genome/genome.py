@@ -26,10 +26,14 @@ class Genome:
 			low = self.parameter_space.spaces[key+"_space"].low
 			high = self.parameter_space.spaces[key+"_space"].high
 			mu = value
-			## truncnorm's clipped parameters are according to a standard normal so scale accordingly. refer their documentation for more details
-			standard_low = (low - mu) / sigma
-			standard_high = (high - mu) / sigma
-			self.parameters[key] =  np.array(truncnorm.rvs(standard_low,standard_high , loc=mu, scale=sigma),dtype=np.float32)
+			new_values = []
+			for i in range(low.shape[0]):
+				sigma_temp = sigma*(high[i] - low[i])
+				## truncnorm's clipped parameters are according to a standard normal so scale accordingly. refer their documentation for more details
+				standard_low = (low[i]- mu[i]) / sigma_temp
+				standard_high = (high[i] - mu[i]) / sigma_temp
+				new_values.append(truncnorm.rvs(standard_low,standard_high , loc=mu[i], scale=sigma_temp))
+			self.parameters[key] = self._nparray(new_values)
 		# self.logger.debug("Mutation finished. Mutated parameters "+str(self.parameters))
 		
 	def crossover(self,mate_genome):
@@ -61,6 +65,9 @@ class Genome:
 		plt.ylabel('Control value')
 		plt.ylim(self.action_limits)
 		plt.show()
+
+	def _nparray(self,list):
+		return np.reshape(np.array(list),newshape=(len(list),1))
 
 	def __deepcopy__(self, memo):
 		cls = self.__class__
