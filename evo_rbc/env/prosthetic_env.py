@@ -5,7 +5,7 @@ import statistics as stats
 class ProstheticEAEnv(EAenv,ProstheticsEnv):
 
 	def __init__(self,seed=1,max_time_steps_qd=300,max_time_steps_task=2000):
-		ProstheticsEnv.__init__(self)
+		ProstheticsEnv.__init__(self,visualize=False)
 		self.seed(seed)
 		EAenv.__init__(self,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task)
 		self.mpi_worker_path = '../../mpi_worker/prosthetic_evaluation_worker.py'
@@ -41,6 +41,6 @@ class ProstheticEAEnv(EAenv,ProstheticsEnv):
 		mean_velocity_x = stats.mean(pelvis_kinematics["vx"])
 		behavior = mean_velocity_x
 
-		performance = len(pelvis_kinematics)*((mean_velocity_x**2) - stats.stdev(pelvis_kinematics["vx"]))
+		performance = len(pelvis_kinematics["vx"])*((mean_velocity_x**2) - stats.stdev(pelvis_kinematics["vx"])**2)
 		self.logger.debug("Evaluation finished with\nbehavior "+str(behavior)+"\nperformance "+str(performance))
 		return (behavior,performance)		

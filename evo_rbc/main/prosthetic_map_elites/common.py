@@ -17,10 +17,10 @@ max_time_steps_task=2000
 visualise = False
 
 #Grid details
-num_dimensions = 2
-lower_limit = np.array([0.0,0.0])
-upper_limit = np.array([5.0,5.0])
-resolution = np.array([.25,.25])
+num_dimensions = 1
+lower_limit = np.array([0.0])
+upper_limit = np.array([5.0])
+resolution = np.array([.25])
 
 
 #initialise environment, genome and repertoire generator

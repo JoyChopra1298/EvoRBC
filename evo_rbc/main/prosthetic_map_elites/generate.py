@@ -1,4 +1,4 @@
-from evo_rbc.main.ant_map_elites.common import get_MAPElites
+from evo_rbc.main.prosthetic_map_elites.common import get_MAPElites
 import click
 
 save_dir = "output/"
