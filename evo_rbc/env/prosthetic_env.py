@@ -42,7 +42,7 @@ class ProstheticEAEnv(EAenv,ProstheticsEnv):
 				mean_velocity_x = stats.mean(pelvis_kinematics["vx"])
 				behavior = mean_velocity_x
 				self.logger.debug("Evaluation stopped since too much time elapsed .Behavior "+str(behavior))
-				return (behavior,-1000.0)
+				return (-1000.0,-1000.0)
 			
 			if(not done):
 				action = []
@@ -61,11 +61,11 @@ class ProstheticEAEnv(EAenv,ProstheticsEnv):
 						mean_velocity_x = stats.mean(pelvis_kinematics["vx"])
 						behavior = mean_velocity_x
 						self.logger.debug("Evaluation stopped since going backwards behavior "+str(behavior))
-						return (behavior,-1000.0)
+						return (-1000.0,-1000.0)
 				
 				pelvis_position_vector_y = state_desc["body_pos"]["pelvis"][1]
 				if(pelvis_position_vector_y < 0.75):
-					performance -= -1
+					performance -= 1
 
 		mean_velocity_x = stats.mean(pelvis_kinematics["vx"])
 		behavior = mean_velocity_x

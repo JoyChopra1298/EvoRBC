@@ -67,8 +67,11 @@ class ProstheticGenome(Genome):
 	glut_max_amplitude_low = [0.3,0.6,0.27]
 	glut_max_amplitude_high = [0.4,0.75,0.33]
 	
-	general_amplitude_low = [0.7,0.3,0.05]
-	general_amplitude_high = [0.9,0.6,0.25]
+	iliopsoas_amplitude_low = [0.55,0.75,0.2]
+	iliopsoas_amplitude_high = [0.65,0.9,0.25]
+
+	general_amplitude_low = [0.3,0.3,0.05]
+	general_amplitude_high = [1.0,0.6,0.25]
 	
 	# percentage is based on gait cycle length
 	soleus_wave_start_percentage_low = [0.2,0.3]
@@ -121,13 +124,18 @@ class ProstheticGenome(Genome):
 	glut_max_wave_width_percentage_low = [0.17,0.3,0.12]
 	glut_max_wave_width_percentage_high = [0.22,0.4,0.17]
 
+	#for adductor and abductor
 	general_wave_start_percentage_low = [0.0,0.0,0.0]
 	general_wave_start_percentage_high = [0.5,0.5,0.6]
 	general_wave_width_percentage_low = [0.25,0.2,0.1]
-	general_wave_width_percentage_high = [0.5,0.7,0.5]
+	general_wave_width_percentage_high = [0.5,0.5,0.25]
 	
-	iliopsoas_wave_width_percentage_low = [0.5,0.2,0.05]
-	iliopsoas_wave_width_percentage_high = [0.75,0.3,0.15]
+	iliopsoas_l_wave_start_percentage_low = [0.4,0.45,0.25]
+	iliopsoas_l_wave_start_percentage_high = [0.5,0.5,0.3]
+	iliopsoas_r_wave_start_percentage_low = [0.9,0.95,0.75]
+	iliopsoas_r_wave_start_percentage_high = [0.99,0.99,0.8]
+	iliopsoas_wave_width_percentage_low = [0.2,0.3,0.05]
+	iliopsoas_wave_width_percentage_high = [0.25,0.35,0.1]
 
 	action_limits = [0,1]
 
@@ -220,14 +228,14 @@ class ProstheticGenome(Genome):
 			high=self._nparray(self.general_wave_start_percentage_high),dtype=np.float32),
 		"add_l_wave_width_percentage_space":spaces.Box(low=self._nparray(self.general_wave_width_percentage_low),
 			high=self._nparray(self.general_wave_width_percentage_high),dtype=np.float32),
-		"iliopsoas_r_amplitude_space":spaces.Box(low=self._nparray(self.general_amplitude_low),high=self._nparray(self.general_amplitude_high),dtype=np.float32),
-		"iliopsoas_r_wave_start_percentage_space":spaces.Box(low=self._nparray(self.general_wave_start_percentage_low),
-			high=self._nparray(self.general_wave_start_percentage_high),dtype=np.float32),
+		"iliopsoas_r_amplitude_space":spaces.Box(low=self._nparray(self.iliopsoas_amplitude_low),high=self._nparray(self.iliopsoas_amplitude_high),dtype=np.float32),
+		"iliopsoas_r_wave_start_percentage_space":spaces.Box(low=self._nparray(self.iliopsoas_r_wave_start_percentage_low),
+			high=self._nparray(self.iliopsoas_r_wave_start_percentage_high),dtype=np.float32),
 		"iliopsoas_r_wave_width_percentage_space":spaces.Box(low=self._nparray(self.iliopsoas_wave_width_percentage_low),
 			high=self._nparray(self.iliopsoas_wave_width_percentage_high),dtype=np.float32),
-		"iliopsoas_l_amplitude_space":spaces.Box(low=self._nparray(self.general_amplitude_low),high=self._nparray(self.general_amplitude_high),dtype=np.float32),
-		"iliopsoas_l_wave_start_percentage_space":spaces.Box(low=self._nparray(self.general_wave_start_percentage_low),
-			high=self._nparray(self.general_wave_start_percentage_high),dtype=np.float32),
+		"iliopsoas_l_amplitude_space":spaces.Box(low=self._nparray(self.iliopsoas_amplitude_low),high=self._nparray(self.iliopsoas_amplitude_high),dtype=np.float32),
+		"iliopsoas_l_wave_start_percentage_space":spaces.Box(low=self._nparray(self.iliopsoas_l_wave_start_percentage_low),
+			high=self._nparray(self.iliopsoas_l_wave_start_percentage_high),dtype=np.float32),
 		"iliopsoas_l_wave_width_percentage_space":spaces.Box(low=self._nparray(self.iliopsoas_wave_width_percentage_low),
 			high=self._nparray(self.iliopsoas_wave_width_percentage_high),dtype=np.float32),
 
@@ -253,11 +261,14 @@ class ProstheticGenome(Genome):
 	def _calculate_wave(self,muscle_name,time_step):
 		gait_time_period = self.parameters["gait_time_period"]
 		cycle_count = int(time_step/gait_time_period)
-		initial_phase_steps = int(gait_time_period*self.parameters["initial_phase"])
+		initial_phase_steps = self.parameters["initial_phase"][0]
 
 		wave = 0.0
 		for i in range(len(self.parameters[muscle_name+"_amplitude"])):
-			start_time_step_i = int((cycle_count + self.parameters[muscle_name+"_wave_start_percentage"][i] )*gait_time_period) + initial_phase_steps
+			current_cycle_count = cycle_count
+			if(self.parameters[muscle_name+"_wave_start_percentage"][i]+self.parameters[muscle_name+"_wave_width_percentage"][i] > 1.0):
+				current_cycle_count = cycle_count - 1
+			start_time_step_i = int((current_cycle_count + self.parameters[muscle_name+"_wave_start_percentage"][i] )*gait_time_period) + initial_phase_steps
 			end_time_step_i = start_time_step_i + int(self.parameters[muscle_name+"_wave_width_percentage"][i] *gait_time_period)
 			wave_i = self.parameters[muscle_name+"_amplitude"][i]*self._truncated_function(np.sin,start_time_step_i,end_time_step_i,
 				np.pi*(time_step-start_time_step_i)/(end_time_step_i-start_time_step_i),time_step)

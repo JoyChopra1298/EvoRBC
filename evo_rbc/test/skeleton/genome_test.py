@@ -5,7 +5,7 @@ prosthetic_genome = ProstheticGenome()
 
 control_duration = 10
 num_generations = 1
-muscle_index = 18
+muscle_index = 5
 
 test_utils.print_heading("Parameter space")
 print(prosthetic_genome.parameter_space)

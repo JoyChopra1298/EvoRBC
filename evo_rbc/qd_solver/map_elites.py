@@ -48,11 +48,12 @@ class MAP_Elites(Repertoire_Generator):
 			parents_len = len(parents)
 			"""len(parents) used instead of batch size since it is possible to not have a complete batch from the container"""
 			children_genomes = []
-			for i in range(parents_len):
-				parent_genome = parents[i][1]["genome"]
-				child_genome = copy.deepcopy(parent_genome)
-				child_genome.mutate(sigma=mutation_stdev)
-				children_genomes.append(child_genome)
+			for j in range(3):
+				for i in range(parents_len):
+					parent_genome = parents[i][1]["genome"]
+					child_genome = copy.deepcopy(parent_genome)
+					child_genome.mutate(sigma=mutation_stdev*(j+1))
+					children_genomes.append(child_genome)
 
 			qd_evaluations = self.parallel_evaluate(genomes=children_genomes,num_processes=num_processes,visualise=visualise)
 
