@@ -36,9 +36,9 @@ class ProstheticEAEnv(EAenv,ProstheticsEnv):
 
 		for time_step in range(self.max_time_steps_qd):
 
-			# stop if evaluation taking too much time (more than 15 minutes)
+			# stop if evaluation taking too much time (more than 5 minutes)
 			current_time = time.time()
-			if( (current_time - start_time) > 900):
+			if( (current_time - start_time) > 300):
 				mean_velocity_x = stats.mean(pelvis_kinematics["vx"])
 				behavior = mean_velocity_x
 				self.logger.debug("Evaluation stopped since too much time elapsed .Behavior "+str(behavior))

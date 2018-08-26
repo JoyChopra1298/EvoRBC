@@ -40,6 +40,9 @@ class ProstheticGenome(Genome):
 	gait_time_period_low = [50.0]
 	gait_time_period_high = [150.0]
 	
+	initial_phase_low = [0.0]
+	initial_phase_high = [0.99]
+
 	soleus_amplitude_low = [0.7,0.0]
 	soleus_amplitude_high = [0.8,0.05]
 	
@@ -131,6 +134,7 @@ class ProstheticGenome(Genome):
 	def __init__(self,parameters=None,seed=1):
 		self.parameter_space = spaces.Dict({		
 		"gait_time_period_space":spaces.Box(low=self._nparray(self.gait_time_period_low),high=self._nparray(self.gait_time_period_high),dtype=np.float32),
+		"initial_phase_space":spaces.Box(low=self._nparray(self.initial_phase_low),high=self._nparray(self.initial_phase_high),dtype=np.float32),
 		"soleus_amplitude_space":spaces.Box(low=self._nparray(self.soleus_amplitude_low),high=self._nparray(self.soleus_amplitude_high),dtype=np.float32),
 		"soleus_wave_start_percentage_space":spaces.Box(low=self._nparray(self.soleus_wave_start_percentage_low),
 			high=self._nparray(self.soleus_wave_start_percentage_high),dtype=np.float32),
@@ -249,10 +253,11 @@ class ProstheticGenome(Genome):
 	def _calculate_wave(self,muscle_name,time_step):
 		gait_time_period = self.parameters["gait_time_period"]
 		cycle_count = int(time_step/gait_time_period)
+		initial_phase_steps = int(gait_time_period*self.parameters["initial_phase"])
 
 		wave = 0.0
 		for i in range(len(self.parameters[muscle_name+"_amplitude"])):
-			start_time_step_i = int((cycle_count + self.parameters[muscle_name+"_wave_start_percentage"][i] )*gait_time_period)
+			start_time_step_i = int((cycle_count + self.parameters[muscle_name+"_wave_start_percentage"][i] )*gait_time_period) + initial_phase_steps
 			end_time_step_i = start_time_step_i + int(self.parameters[muscle_name+"_wave_width_percentage"][i] *gait_time_period)
 			wave_i = self.parameters[muscle_name+"_amplitude"][i]*self._truncated_function(np.sin,start_time_step_i,end_time_step_i,
 				np.pi*(time_step-start_time_step_i)/(end_time_step_i-start_time_step_i),time_step)
