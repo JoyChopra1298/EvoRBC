@@ -35,4 +35,7 @@ In the ant implementation, frequency is also taken as variable parameter since i
 ## Muscles activations during one gait cycle
 ![image](https://user-images.githubusercontent.com/27682820/44631150-e145e980-a985-11e8-82d8-2e9399df29a5.png)
 
+![image](https://user-images.githubusercontent.com/27682820/44631310-bfe5fd00-a987-11e8-8d54-0620d1fc7c84.png)
+
+
 ![image](https://user-images.githubusercontent.com/27682820/44631163-ffabe500-a985-11e8-9e23-bb13b00e99cb.png)
