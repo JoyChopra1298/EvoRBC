@@ -32,7 +32,7 @@ class ProstheticEAEnv(EAenv,ProstheticsEnv):
 		performance = 0.0
 
 		start_time = time.time()
-		self.logger.debug("Starting an evaluation for steady skeleton runner at time ",start_time)
+		self.logger.debug("Starting an evaluation for steady skeleton runner")
 
 		for time_step in range(self.max_time_steps_qd):
 
@@ -66,6 +66,8 @@ class ProstheticEAEnv(EAenv,ProstheticsEnv):
 				pelvis_position_vector_y = state_desc["body_pos"]["pelvis"][1]
 				if(pelvis_position_vector_y < 0.75):
 					performance -= 1
+
+				performance += 2*state_desc["body_pos"]["head"][0]-state_desc["body_pos"]["pelvis"][0]
 
 		mean_velocity_x = stats.mean(pelvis_kinematics["vx"])
 		behavior = mean_velocity_x

@@ -48,8 +48,10 @@ class MAP_Elites(Repertoire_Generator):
 			parents_len = len(parents)
 			"""len(parents) used instead of batch size since it is possible to not have a complete batch from the container"""
 			children_genomes = []
-			for j in range(3):
-				for i in range(parents_len):
+
+			child_multiplier = 3
+			for i in range(parents_len):
+				for j in range(child_multiplier):
 					parent_genome = parents[i][1]["genome"]
 					child_genome = copy.deepcopy(parent_genome)
 					child_genome.mutate(sigma=mutation_stdev*(j+1))
@@ -62,14 +64,15 @@ class MAP_Elites(Repertoire_Generator):
 			total_quality_increase_by_better_genomes_in_this_iteration = 0
 			old_num_genomes = self.container.num_genomes
 
-			for i in range(len(parents)):
+			for i in range(len(children_genomes)):
 				child_genome = children_genomes[i]
+				parent_index = int(i/child_multiplier)
 				behavior,quality = qd_evaluations[i%num_processes][int(i/num_processes)]
-				self.logger.debug("parent_curiosity before "+str(parents[i][1]["curiosity"]))
+				self.logger.debug("parent_curiosity before "+str(parents[parent_index][1]["curiosity"]))
 				
 				bin_index = self.container.get_bin(behavior)				
 				self.logger.debug("Child bin index "+str(bin_index))
-				parent_bin_index = parents[i][0]
+				parent_bin_index = parents[parent_index][0]
 				self.logger.debug("Parent bin index "+str(parent_bin_index))
 
 				### Check if child should be saved into the repertoire and update parent's curiosity score accordingly
@@ -84,15 +87,15 @@ class MAP_Elites(Repertoire_Generator):
 						num_better_genome_found_in_this_iteration += 1
 						total_quality_increase_by_better_genomes_in_this_iteration += quality - old_genome_quality
 
-					parents[i][1]["curiosity"] *= self.container.curiosity_multiplier
-					self.container.update_bin(bin_index=parents[i][0],genome_details=parents[i][1])
+					parents[parent_index][1]["curiosity"] *= self.container.curiosity_multiplier
+					self.container.update_bin(bin_index=parents[parent_index][0],genome_details=parents[parent_index][1])
 					self.container.add_genome(genome=child_genome,behavior=behavior,quality=quality)
 
 				else:
-					parents[i][1]["curiosity"] /= self.container.curiosity_multiplier
-					parents[i][1]["curiosity"] = np.clip(a=parents[i][1]["curiosity"],a_min=self.container.min_curiosity,a_max=np.inf)
-					self.container.update_bin(bin_index=parent_bin_index,genome_details=parents[i][1])
-				self.logger.debug("parent_curiosity after "+str(parents[i][1]["curiosity"]))
+					parents[parent_index][1]["curiosity"] /= self.container.curiosity_multiplier
+					parents[parent_index][1]["curiosity"] = np.clip(a=parents[parent_index][1]["curiosity"],a_min=self.container.min_curiosity,a_max=np.inf)
+					self.container.update_bin(bin_index=parent_bin_index,genome_details=parents[parent_index][1])
+				self.logger.debug("parent_curiosity after "+str(parents[parent_index][1]["curiosity"]))
 			
 			## Store metrics
 			self.metrics["num_better_genome_found"].append(num_better_genome_found_in_this_iteration)
