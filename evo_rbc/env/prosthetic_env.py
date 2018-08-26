@@ -1,6 +1,8 @@
 from osim.env import ProstheticsEnv
 from .eaenv import EAenv
 import statistics as stats
+import numpy as np
+import time
 
 class ProstheticEAEnv(EAenv,ProstheticsEnv):
 
@@ -22,9 +24,26 @@ class ProstheticEAEnv(EAenv,ProstheticsEnv):
 		done = False
 		self.reset()
 		
-		pelvis_kinematics = {"vx":[],"vy":[],"vz":[]}
-		self.logger.debug("Starting an evaluation for steady skeleton runner")
+		pelvis_kinematics = {"vx":[],"vy":[],"vz":[],"rz":[]}
+		
+		initial_state_desc = self.get_state_desc()
+		initial_position_x = initial_state_desc["body_pos"]["pelvis"][0]
+
+		performance = 0.0
+
+		start_time = time.time()
+		self.logger.debug("Starting an evaluation for steady skeleton runner at time ",start_time)
+
 		for time_step in range(self.max_time_steps_qd):
+
+			# stop if evaluation taking too much time (more than 15 minutes)
+			current_time = time.time()
+			if( (current_time - start_time) > 900):
+				mean_velocity_x = stats.mean(pelvis_kinematics["vx"])
+				behavior = mean_velocity_x
+				self.logger.debug("Evaluation stopped since too much time elapsed .Behavior "+str(behavior))
+				return (behavior,-1000.0)
+			
 			if(not done):
 				action = []
 				for muscle_index in range(self.action_space.shape[0]):
@@ -35,12 +54,29 @@ class ProstheticEAEnv(EAenv,ProstheticsEnv):
 				state_desc = self.get_state_desc()
 				pelvis_velocity_vector = state_desc["body_vel"]["pelvis"] 
 				pelvis_kinematics["vx"].append(pelvis_velocity_vector[0])
-				# pelvis_kinematics["vy"].append(pelvis_velocity_vector[1])
-				# pelvis_kinematics["vz"].append(pelvis_position_vector[2])
+				if(time_step==100):
+					pelvis_position_x = state_desc["body_pos"]["pelvis"][0]
+					if(pelvis_position_x < initial_position_x):
+						### stop computation since going backwards
+						mean_velocity_x = stats.mean(pelvis_kinematics["vx"])
+						behavior = mean_velocity_x
+						self.logger.debug("Evaluation stopped since going backwards behavior "+str(behavior))
+						return (behavior,-1000.0)
+				
+				pelvis_position_vector_y = state_desc["body_pos"]["pelvis"][1]
+				if(pelvis_position_vector_y < 0.75):
+					performance -= -1
 
 		mean_velocity_x = stats.mean(pelvis_kinematics["vx"])
 		behavior = mean_velocity_x
 
-		performance = len(pelvis_kinematics["vx"])*((mean_velocity_x**2) - stats.stdev(pelvis_kinematics["vx"])**2)
-		self.logger.debug("Evaluation finished with\nbehavior "+str(behavior)+"\nperformance "+str(performance))
+		##penalise negative velocity
+		if(behavior < 0):
+			performance -= 50.0
+
+		performance += len(pelvis_kinematics["vx"])*((mean_velocity_x**2) - stats.stdev(pelvis_kinematics["vx"])**2) 
+
+		self.logger.debug("Evaluation finished with\nbehavior "+str(behavior)+"\nperformance "+str(performance)+"\n survived for timesteps "
+			+str(len(pelvis_kinematics["vx"])))
+		
 		return (behavior,performance)		

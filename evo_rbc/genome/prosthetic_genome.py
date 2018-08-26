@@ -119,9 +119,12 @@ class ProstheticGenome(Genome):
 	glut_max_wave_width_percentage_high = [0.22,0.4,0.17]
 
 	general_wave_start_percentage_low = [0.0,0.0,0.0]
-	general_wave_start_percentage_high = [0.99,0.99,0.99]
+	general_wave_start_percentage_high = [0.5,0.5,0.6]
 	general_wave_width_percentage_low = [0.25,0.2,0.1]
 	general_wave_width_percentage_high = [0.5,0.7,0.5]
+	
+	iliopsoas_wave_width_percentage_low = [0.5,0.2,0.05]
+	iliopsoas_wave_width_percentage_high = [0.75,0.3,0.15]
 
 	action_limits = [0,1]
 
@@ -216,13 +219,13 @@ class ProstheticGenome(Genome):
 		"iliopsoas_r_amplitude_space":spaces.Box(low=self._nparray(self.general_amplitude_low),high=self._nparray(self.general_amplitude_high),dtype=np.float32),
 		"iliopsoas_r_wave_start_percentage_space":spaces.Box(low=self._nparray(self.general_wave_start_percentage_low),
 			high=self._nparray(self.general_wave_start_percentage_high),dtype=np.float32),
-		"iliopsoas_r_wave_width_percentage_space":spaces.Box(low=self._nparray(self.general_wave_width_percentage_low),
-			high=self._nparray(self.general_wave_width_percentage_high),dtype=np.float32),
+		"iliopsoas_r_wave_width_percentage_space":spaces.Box(low=self._nparray(self.iliopsoas_wave_width_percentage_low),
+			high=self._nparray(self.iliopsoas_wave_width_percentage_high),dtype=np.float32),
 		"iliopsoas_l_amplitude_space":spaces.Box(low=self._nparray(self.general_amplitude_low),high=self._nparray(self.general_amplitude_high),dtype=np.float32),
 		"iliopsoas_l_wave_start_percentage_space":spaces.Box(low=self._nparray(self.general_wave_start_percentage_low),
 			high=self._nparray(self.general_wave_start_percentage_high),dtype=np.float32),
-		"iliopsoas_l_wave_width_percentage_space":spaces.Box(low=self._nparray(self.general_wave_width_percentage_low),
-			high=self._nparray(self.general_wave_width_percentage_high),dtype=np.float32),
+		"iliopsoas_l_wave_width_percentage_space":spaces.Box(low=self._nparray(self.iliopsoas_wave_width_percentage_low),
+			high=self._nparray(self.iliopsoas_wave_width_percentage_high),dtype=np.float32),
 
 		})
 		super().__init__(parameters=parameters,seed=seed)

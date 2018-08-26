@@ -5,7 +5,7 @@ save_dir = "output/"
 
 @click.command()
 @click.option('--num_iterations', type=int, default=1000, help='number of iterations to run on repertoire')
-@click.option('--save_freq',type=int,default=25,help='number of iterations after which to save/checkpoint repertoire')
+@click.option('--save_freq',type=int,default=5,help='number of iterations after which to save/checkpoint repertoire')
 @click.option('--num_processes',type=int,default=15,help='number of processes to run for evaluations to paralellise work')
 @click.option('--visualise',type=bool,default=False,help='visualise each evaluation of environment')
 @click.option('--load_path',type=str,default=None,help='path to load a pre-built repertoire and iterate further on it')

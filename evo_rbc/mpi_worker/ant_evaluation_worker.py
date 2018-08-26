@@ -31,5 +31,4 @@ for i in range(len(genomes)):
 
 qd_evaluations = comm.gather(qd_evaluations,root=0)
 
-
 comm.Disconnect()

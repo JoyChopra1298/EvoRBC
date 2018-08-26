@@ -1,6 +1,6 @@
-from evo_rbc.main.ant_map_elites.common import get_MAPElites
+from evo_rbc.main.prosthetic_map_elites.common import get_MAPElites
 
-load_path = "ant_map_elites_repertoire_1975.pkl"
+load_path = "map_elites_repertoire_50.pkl"
 
 map_elites = get_MAPElites()
 map_elites.load_repertoire(load_path)
@@ -17,5 +17,5 @@ def play(bin_index):
 
 behavior = map_elites.container.min_quality_bin
 
-play((31,15))
+play((0,))
 # map_elites.view_metrics("num_new_genomes")

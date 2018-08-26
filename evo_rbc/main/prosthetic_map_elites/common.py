@@ -20,7 +20,7 @@ visualise = False
 num_dimensions = 1
 lower_limit = np.array([0.0])
 upper_limit = np.array([5.0])
-resolution = np.array([.25])
+resolution = np.array([.05])
 
 
 #initialise environment, genome and repertoire generator

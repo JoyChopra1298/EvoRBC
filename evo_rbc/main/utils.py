@@ -32,6 +32,7 @@ formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s',datefmt=
 file_handler.setFormatter(formatter)
 logging.getLogger('').addHandler(file_handler)
 
+logging.getLogger("matplotlib").setLevel(logging.WARNING)
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
