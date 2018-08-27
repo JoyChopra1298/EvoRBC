@@ -88,13 +88,13 @@ class MAP_Elites(Repertoire_Generator):
 						total_quality_increase_by_better_genomes_in_this_iteration += quality - old_genome_quality
 
 					parents[parent_index][1]["curiosity"] *= self.container.curiosity_multiplier
-					self.container.update_bin(bin_index=parents[parent_index][0],genome_details=parents[parent_index][1])
+					self.container.update_curiosity(bin_index=parent_bin_index,genome_details=parents[parent_index][1]["curiosity"])
 					self.container.add_genome(genome=child_genome,behavior=behavior,quality=quality)
 
 				else:
 					parents[parent_index][1]["curiosity"] /= self.container.curiosity_multiplier
 					parents[parent_index][1]["curiosity"] = np.clip(a=parents[parent_index][1]["curiosity"],a_min=self.container.min_curiosity,a_max=np.inf)
-					self.container.update_bin(bin_index=parent_bin_index,genome_details=parents[parent_index][1])
+					self.container.update_curiosity(bin_index=parent_bin_index,genome_details=parents[parent_index][1]["curiosity"])
 				self.logger.debug("parent_curiosity after "+str(parents[parent_index][1]["curiosity"]))
 			
 			## Store metrics

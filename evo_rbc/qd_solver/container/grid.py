@@ -65,6 +65,12 @@ class Grid(Container):
 		self.grid[bin_index] = copy.deepcopy(genome_details)
 		self.logger.debug("Updating details for bin "+str(bin_index))
 
+	def update_curiosity(self,bin_index,curiosity):
+		"""updates curiosity for the genome"""
+		self.grid[bin_index]["curiosity"] = curiosity
+		self.logger.debug("Updating curiosity for bin "+str(bin_index)+" new curiosity "+str(curiosity))
+
+
 	def find_min_quality_genome(self):
 		### since this is rare so iterating whole container for now. need better data structure
 		for bin_index,genome_details in self.grid.items():
