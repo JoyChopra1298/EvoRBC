@@ -14,11 +14,11 @@ class Grid(Container):
 		self.num_bins = np.ceil((upper_limit - lower_limit)/resolution).astype(int)
 		self.min_curiosity = min_curiosity
 		self.curiosity_multiplier = curiosity_multiplier
-		
+
 		#initialise grid with empty bins. will store a dict in each bin {"genome":,"quality":}
 		self.grid = {}
 		self.logger.debug("Grid initialised")
-		
+
 	def get_bin(self,behavior):
 		"""get the bin corresponding to a particular behavior, linear mapping is used. behavior is forced to be between limits by clipping it"""
 		behavior = np.clip(behavior,self.lower_limit,self.upper_limit)
@@ -35,14 +35,20 @@ class Grid(Container):
 
 	def add_genome(self,genome,behavior,quality):
 		"""add the genome to container"""
+
+
 		bin_index = self.get_bin(behavior)
 		if(bin_index in self.grid):
-			self.total_quality += quality - self.grid[bin_index]["quality"]
-			self.update_bin(bin_index,{"genome":genome,"quality":quality,"curiosity":1.0})
-			if(bin_index==self.min_quality_bin):
-				self.logger.debug("found better quality for current minima. updating min quality genome. bin "+str(bin_index))
-				self.min_quality = quality
-				self.find_min_quality_genome()
+			if quality> self.grid[bin_index]["quality"]:
+				self.total_quality += quality - self.grid[bin_index]["quality"]
+				self.update_bin(bin_index,{"genome":genome,"quality":quality,"curiosity":1.0})
+				if(bin_index==self.min_quality_bin):
+					self.logger.debug("found better quality for current minima. updating min quality genome. bin "+str(bin_index))
+					self.min_quality = quality
+					self.find_min_quality_genome()
+			else:
+				self.logger.debug("Tried to add a low quality genone in bin index ",self.grid[bin_index])
+
 		else:
 			self.total_quality += quality
 			self.num_genomes += 1

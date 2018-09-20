@@ -9,6 +9,9 @@ class Uniform_Random_Selector(Selector):
 	def select(self,container,num_samples):
 		"""select num_samples from container. container is dict of dicts {"bin_index":{"genome","quality",other details},...}
 		print a warning if num_samples is more than container size"""
+
+		# use bin_index only for sampling
+
 		population = [[bin_index,genome_details] for bin_index,genome_details in container.items()]
 		population_size = len(population)
 		if(num_samples>population_size):

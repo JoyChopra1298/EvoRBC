@@ -19,7 +19,7 @@ class MAP_Elites(Repertoire_Generator):
 		self.metrics = {"num_better_genome_found":[],
 		"total_quality_increase_by_better_genomes":[],
 		"num_new_genomes":[],"container_metrics":[]}
-		
+
 	def generate_repertoire(self,num_iterations,save_dir,save_freq,visualise,mutation_stdev=0.01,num_processes=1):
 		""" generate a random population initially, generating double the batch_size to increase the probability that
 		 that at least batch_size elements get added"""
@@ -44,7 +44,7 @@ class MAP_Elites(Repertoire_Generator):
 		for iteration in range(self.current_iteration,self.current_iteration+num_iterations):
 			self.logger.info("Iteration "+str(iteration))
 			parents = self.selector.select(self.container.grid,self.batch_size)
-			
+
 			parents_len = len(parents)
 			"""len(parents) used instead of batch size since it is possible to not have a complete batch from the container"""
 			children_genomes = []
@@ -69,15 +69,15 @@ class MAP_Elites(Repertoire_Generator):
 				parent_index = int(i/child_multiplier)
 				behavior,quality = qd_evaluations[i%num_processes][int(i/num_processes)]
 				self.logger.debug("parent_curiosity before "+str(parents[parent_index][1]["curiosity"]))
-				
-				bin_index = self.container.get_bin(behavior)				
+
+				bin_index = self.container.get_bin(behavior)
 				self.logger.debug("Child bin index "+str(bin_index))
 				parent_bin_index = parents[parent_index][0]
 				self.logger.debug("Parent bin index "+str(parent_bin_index))
 
 				### Check if child should be saved into the repertoire and update parent's curiosity score accordingly
 				if(self.container.is_high_quality(behavior=behavior,quality=quality)):
-					"""Note that it is important to update parent before adding child as if done in reverse order then parent might 
+					"""Note that it is important to update parent before adding child as if done in reverse order then parent might
 					replace a high quality child showing same behavior"""
 					self.logger.debug("Adding child with behavior and quality"+str(behavior)+str(quality))
 					### metrics when child replaces some genome
@@ -96,14 +96,14 @@ class MAP_Elites(Repertoire_Generator):
 					parents[parent_index][1]["curiosity"] = np.clip(a=parents[parent_index][1]["curiosity"],a_min=self.container.min_curiosity,a_max=np.inf)
 					self.container.update_curiosity(bin_index=parent_bin_index,genome_details=parents[parent_index][1]["curiosity"])
 				self.logger.debug("parent_curiosity after "+str(parents[parent_index][1]["curiosity"]))
-			
+
 			## Store metrics
 			self.metrics["num_better_genome_found"].append(num_better_genome_found_in_this_iteration)
 			self.metrics["total_quality_increase_by_better_genomes"].append(total_quality_increase_by_better_genomes_in_this_iteration)
 			self.metrics["num_new_genomes"].append(self.container.num_genomes - old_num_genomes)
 			self.metrics["container_metrics"].append(self.container.get_metrics())
-			
-			### Log metrics 
+
+			### Log metrics
 			self.log_metrics()
 			self.logger.info("Number of better genomes found in this iteration "+str(num_better_genome_found_in_this_iteration))
 			self.logger.info("Total quality increase by better genomes in this iteration "+str(total_quality_increase_by_better_genomes_in_this_iteration))
@@ -111,12 +111,13 @@ class MAP_Elites(Repertoire_Generator):
 				self.logger.info("Normalised quality increase by better genomes in this iteration "
 					+str(total_quality_increase_by_better_genomes_in_this_iteration/num_better_genome_found_in_this_iteration))
 			self.logger.info("Number of new genomes added in this iteration "+str(self.container.num_genomes - old_num_genomes)+"\n")
-			
+			self.current_iteration+=1
 			## Save repertoire
+
 			if(iteration%save_freq==0 and (save_dir is not None)):
 				self.save_repertoire(save_file_path=save_dir+"map_elites_repertoire_"+str(iteration)+".pkl")
 				self.logger.info("Saving repertoire for iteration "+str(iteration)+"\n")
-			self.current_iteration+=1
+
 
 	def log_metrics(self):
 		self.logger.info("Repertoire Metrics")
@@ -129,7 +130,7 @@ class MAP_Elites(Repertoire_Generator):
 		for key,value in self.container.get_metrics().items():
 			print(key+" "+str(value))
 		print("")
-	
+
 	def save_repertoire(self,save_file_path):
 		os.makedirs(os.path.dirname(save_file_path), exist_ok=True)
 		with open(save_file_path, 'wb') as f:
@@ -144,6 +145,8 @@ class MAP_Elites(Repertoire_Generator):
 
 	def parallel_evaluate(self,genomes,visualise,num_processes):
 		"""send the genome for evaluation to any worker that is free and return the resultant behavior,quality"""
+
+		# execute the prosthetic_evaluation_worker for num_processes times i.e 16 in our case
 		comm = MPI.COMM_SELF.Spawn(sys.executable,
 									   args=[self.env.mpi_worker_path],
 									   maxprocs=num_processes)
@@ -151,25 +154,31 @@ class MAP_Elites(Repertoire_Generator):
 
 		genomes_matrix = [[] for i in range(num_processes)]
 
+		# it stores which genomes go to ith core for evaluation
 		for i in range(genomes_len):
 			genomes_matrix[i%num_processes].append(genomes[i])
 
+		# bcast sends same piece of imformation to each process
 		max_time_steps_qd = comm.bcast(self.env.max_time_steps_qd,root=MPI.ROOT)
+
+		# scatter sends each process a row of input array
 		genome = comm.scatter(genomes_matrix,root=MPI.ROOT)
 		visualise = comm.bcast(visualise,root=MPI.ROOT)
 
 		qd_evaluations = None
+
+		# gather takes evaluations from each process
 		qd_evaluations = comm.gather(qd_evaluations,root=MPI.ROOT)
 
 		comm.Disconnect()
-		
+
 		return qd_evaluations
 
 	def view_metrics(self,metric_key,secondary_metric_key=None):
 		"""Show the metrics as plot"""
 		if(secondary_metric_key):
 			metric_list = [self.metrics[metric_key][i][secondary_metric_key] for i in range(len(self.metrics[metric_key]))]
-			ylabel = metric_key+" "+str(secondary_metric_key) 
+			ylabel = metric_key+" "+str(secondary_metric_key)
 		else:
 			metric_list = self.metrics[metric_key]
 			ylabel = metric_key

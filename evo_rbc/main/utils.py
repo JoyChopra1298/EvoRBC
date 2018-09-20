@@ -1,5 +1,6 @@
 import logging,os
-
+import osim.env
+print ("yppppppppppppppppppppppppppppp")
 heading_decorator = "\n-------------------------------------------\n"
 
 def print_heading(heading):

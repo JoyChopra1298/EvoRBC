@@ -23,9 +23,9 @@ class ProstheticEAEnv(EAenv,ProstheticsEnv):
 		"""quality_diversity fitness function for a runner with steady velocity vector"""
 		done = False
 		self.reset()
-		
+
 		pelvis_kinematics = {"vx":[],"vy":[],"vz":[],"rz":[]}
-		
+
 		initial_state_desc = self.get_state_desc()
 		initial_position_x = initial_state_desc["body_pos"]["pelvis"][0]
 
@@ -43,18 +43,22 @@ class ProstheticEAEnv(EAenv,ProstheticsEnv):
 				behavior = mean_velocity_x
 				self.logger.debug("Evaluation stopped since too much time elapsed .Behavior "+str(behavior))
 				return (-1000.0,-1000.0)
-			
+
 			if(not done):
 				action = []
 				for muscle_index in range(self.action_space.shape[0]):
 					action.append(primitive_genome.control_function(muscle_index=muscle_index,time_step=time_step))
-				observation, reward, done, info = self.step(action) 
+				observation, reward, done, info = self.step(action)
 				if(visualise):
 					self.render()
 				state_desc = self.get_state_desc()
-				pelvis_velocity_vector = state_desc["body_vel"]["pelvis"] 
+				pelvis_velocity_vector = state_desc["body_vel"]["pelvis"]
 				pelvis_kinematics["vx"].append(pelvis_velocity_vector[0])
+
+				#if going backwards  then stop execution
+
 				if(time_step==100):
+
 					pelvis_position_x = state_desc["body_pos"]["pelvis"][0]
 					if(pelvis_position_x < initial_position_x):
 						### stop computation since going backwards
@@ -62,12 +66,14 @@ class ProstheticEAEnv(EAenv,ProstheticsEnv):
 						behavior = mean_velocity_x
 						self.logger.debug("Evaluation stopped since going backwards behavior "+str(behavior))
 						return (-1000.0,-1000.0)
-				
+
+				# if hip is less than a desired height then penalty of -1
 				pelvis_position_vector_y = state_desc["body_pos"]["pelvis"][1]
 				if(pelvis_position_vector_y < 0.75):
 					performance -= 1
 
-				performance += 2*state_desc["body_pos"]["head"][0]-state_desc["body_pos"]["pelvis"][0]
+				#reward for forward tilt
+				performance += 2*(state_desc["body_pos"]["head"][0]-state_desc["body_pos"]["pelvis"][0])
 
 		mean_velocity_x = stats.mean(pelvis_kinematics["vx"])
 		behavior = mean_velocity_x
@@ -76,9 +82,9 @@ class ProstheticEAEnv(EAenv,ProstheticsEnv):
 		if(behavior < 0):
 			performance -= 50.0
 
-		performance += len(pelvis_kinematics["vx"])*((mean_velocity_x**2) - stats.stdev(pelvis_kinematics["vx"])**2) 
+		performance += len(pelvis_kinematics["vx"])*((mean_velocity_x**2) - stats.stdev(pelvis_kinematics["vx"])**2)
 
 		self.logger.debug("Evaluation finished with\nbehavior "+str(behavior)+"\nperformance "+str(performance)+"\n survived for timesteps "
 			+str(len(pelvis_kinematics["vx"])))
-		
-		return (behavior,performance)		
+
+		return (behavior,performance)

@@ -1,6 +1,6 @@
 import copy,logging
 import evo_rbc.main.utils as utils
-import numpy as np 
+import numpy as np
 from collections import OrderedDict
 from scipy.stats import truncnorm
 import matplotlib.pyplot as plt
@@ -18,7 +18,7 @@ class Genome:
 		## Set random number seed for all scipy and numpy operations so that experiments can be reproduced
 		np.random.seed(seed=seed)
 		# self.logger.debug("Created random genome"+str(self.parameters))
-	
+
 	def mutate(self,sigma=0.01):
 		"""Mutate the genome using a truncated gaussian"""
 		# self.logger.debug("Mutating genome. Current parameters - "+str(self.parameters))
@@ -35,7 +35,7 @@ class Genome:
 				new_values.append(truncnorm.rvs(standard_low,standard_high , loc=mu[i], scale=sigma_temp))
 			self.parameters[key] = self._nparray(new_values)
 		# self.logger.debug("Mutation finished. Mutated parameters "+str(self.parameters))
-		
+
 	def crossover(self,mate_genome):
 		"""Cross self with mate_genome. Take parameters from either parent randomly"""
 		# self.logger.debug("Crossing genomes with parameters "+str(self.parameters)+str(mate_genome.parameters))
@@ -44,7 +44,7 @@ class Genome:
 			bit_mask = np.random.choice(2,value.shape)
 			child_parameters[key] = np.array(bit_mask*value + (1 - bit_mask)*mate_genome.parameters[key],dtype=np.float32)
 		# self.logger.debug("Child parameters "+str(child_parameters))
-		return self.__class__(parameters=child_parameters,seed=self.seed)	
+		return self.__class__(parameters=child_parameters,seed=self.seed)
 
 	def sample_random_genome(self):
 		ordered_dict = self.parameter_space.sample()
@@ -59,7 +59,7 @@ class Genome:
 		"""Plot the control function of the genome for specified number of time steps"""
 		control_values = []
 		for i in range(num_timesteps):
-			control_values.append(self.control_function(time_step=i+1,**kwargs))
+			control_values.append(self.control_function(time_step=i+1,**kwargs)[0])
 		plt.plot([i+1 for i in range(num_timesteps)],control_values)
 		plt.xlabel('Time step')
 		plt.ylabel('Control value')
@@ -79,7 +79,7 @@ class Genome:
 				continue
 			setattr(result, k, copy.deepcopy(v, memo))
 		return result
-		
+
 	def __getstate__(self):
 		excluded_subnames = ["logger"]
 		state = {}
@@ -93,4 +93,4 @@ class Genome:
 		for k,v in state.items():
 			self.__dict__[k] = v
 		self.logger = utils.getLogger()
-				
+
