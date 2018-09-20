@@ -8,7 +8,7 @@ from .eaenv import EAenv
 
 class ProstheticEAEnv(EAenv, ProstheticsEnv):
 
-    def __init__(self, seed=1, max_time_steps_qd=300, max_time_steps_task=2000, visualize=False,joint_error_margin=0.05):
+    def __init__(self, seed=1, max_time_steps_qd=300, max_time_steps_task=2000, visualize=False,joint_error_margin=0.1):
         ProstheticsEnv.__init__(self, visualize=visualize)
         self.seed(seed)
         EAenv.__init__(self, max_time_steps_qd=max_time_steps_qd, max_time_steps_task=max_time_steps_task)
@@ -75,17 +75,17 @@ class ProstheticEAEnv(EAenv, ProstheticsEnv):
 
                 ### restrict knee and hip angles
 
-                knee_rot_min = -1.25
-                knee_rot_max = 0.0
-                hip_rot_min = -0.34
-                hip_rot_max = 0.43
+                knee_rot_min = -1.7
+                knee_rot_max = 0.15
+                hip_rot_min = -0.65
+                hip_rot_max = 0.6
 
 
                 osim_model = self.osim_model
                 model = osim_model.model
                 state = osim_model.state
 
-                ### KNEE - should be between 0 to around 72 degree (1.25 radian) Error margin - 0.05
+                ### KNEE - should be between 0 to around 72 degree (1.25 radian) Error margin - 0.1
                 #  ..... mostly should be near 20 degree
                 knee_right_rot = model.getStateVariableValue(state, "knee_r/knee_angle_r/value")
                 knee_left_rot = model.getStateVariableValue(state, "knee_l/knee_angle_l/value")
@@ -93,25 +93,25 @@ class ProstheticEAEnv(EAenv, ProstheticsEnv):
                 if(knee_left_rot > (knee_rot_max + self.joint_error_margin) or knee_left_rot < (knee_rot_min-self.joint_error_margin)):
                     self.logger.debug("Evaluation stopped since left knee angle outside permissible range "
                                       +str(knee_left_rot) + " at time step " + str(time_step))
-                    return (-1000.0, -1000.0)
+                    return (-2000.0, -2000.0)
                 if(knee_right_rot > (knee_rot_max + self.joint_error_margin) or knee_right_rot < (knee_rot_min-self.joint_error_margin)):
                     self.logger.debug("Evaluation stopped since right knee angle outside permissible range "
                                       + str(knee_right_rot) + " at time step " + str(time_step))
-                    return (-1000.0, -1000.0)
+                    return (-2000.0, -2000.0)
 
-                ### HIP - should be between -20 (-0.34) to around 25 degree (0.43 radian) Error margin - 0.05
+                ### HIP - should be between -20 (-0.34) to around 25 degree (0.43 radian) Error margin - 0.1
                 hip_left_rot = model.getStateVariableValue(state, "hip_l/hip_flexion_l/value")
                 hip_right_rot = model.getStateVariableValue(state, "hip_r/hip_flexion_r/value")
 
                 if(hip_left_rot > (hip_rot_max + self.joint_error_margin) or hip_left_rot < (hip_rot_min-self.joint_error_margin)):
                     self.logger.debug("Evaluation stopped since left hip angle outside permissible range "
                                       +str(hip_left_rot) + " at time step " + str(time_step))
-                    return (-1000.0, -1000.0)
+                    return (-2000.0, -2000.0)
 
                 if(hip_right_rot > (hip_rot_max + self.joint_error_margin) or hip_right_rot < (hip_rot_min-self.joint_error_margin)):
                     self.logger.debug("Evaluation stopped since right hip angle outside permissible range "
                                       + str(knee_right_rot)+ " at time step " + str(time_step))
-                    return (-1000.0, -1000.0)
+                    return (-2000.0, -2000.0)
 
                 ############ end of angle restrictions
 

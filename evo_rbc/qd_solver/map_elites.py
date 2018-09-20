@@ -111,7 +111,12 @@ class MAP_Elites(Repertoire_Generator):
 			for i in range(children_genomes_len,children_genomes_len+extra_random_genomes_len):
 				behavior, quality = qd_evaluations[i % num_processes][int(i / num_processes)]
 				if (self.container.is_high_quality(behavior=behavior, quality=quality)):
-					self.container.add_genome(genome=random_genomes[i], behavior=behavior, quality=quality)
+					bin_index = self.container.get_bin(behavior)
+					old_genome_quality = self.container.grid[bin_index]["quality"]
+					self.logger.debug("Old quality in same bin " + str(old_genome_quality))
+					num_better_genome_found_in_this_iteration += 1
+					total_quality_increase_by_better_genomes_in_this_iteration += quality - old_genome_quality
+					self.container.add_genome(genome=children_genomes[i], behavior=behavior, quality=quality)
 
 			## Store metrics
 			self.metrics["num_better_genome_found"].append(num_better_genome_found_in_this_iteration)
@@ -174,6 +179,7 @@ class MAP_Elites(Repertoire_Generator):
 		max_time_steps_qd = comm.bcast(self.env.max_time_steps_qd,root=MPI.ROOT)
 		genome = comm.scatter(genomes_matrix,root=MPI.ROOT)
 		visualise = comm.bcast(visualise,root=MPI.ROOT)
+		joint_error_margin = comm.bcast(self.env.joint_error_margin,root=MPI.ROOT)
 
 		qd_evaluations = None
 		qd_evaluations = comm.gather(qd_evaluations,root=MPI.ROOT)

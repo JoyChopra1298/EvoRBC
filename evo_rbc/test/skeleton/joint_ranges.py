@@ -49,6 +49,9 @@ for i in range(1):
 
         osim_model.integrate()
 
+        print(model.getStateVariableValue(state, "knee_l/knee_angle_l/value"))
+        print(model.getStateVariableValue(state, "knee_r/knee_angle_r/value"))
+        print(model.getStateVariableValue(state, "hip_l/hip_flexion_l/value"))
         print(model.getStateVariableValue(state, "hip_r/hip_flexion_r/value"))
 
         if (done):

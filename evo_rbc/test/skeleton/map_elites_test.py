@@ -1,26 +1,29 @@
 from evo_rbc.qd_solver.map_elites import MAP_Elites
 from evo_rbc.genome.prosthetic_genome import ProstheticGenome
 from evo_rbc.env.prosthetic_env import ProstheticEAEnv
-from evo_rbc.qd_solver.container.grid import Grid
 import numpy as np
 import evo_rbc.main.utils as test_utils
 from evo_rbc.qd_solver.selector.uniform_random_selector import Uniform_Random_Selector
 from evo_rbc.qd_solver.selector.curiosity_driven_selector import Curiosity_Driven_Selector
 
 seed = 1
-batch_size = 3
-max_time_steps_qd=1000
+batch_size = 5
+max_time_steps_qd=300
 max_time_steps_task=2000
-visualise = False
+visualise = visualize = True
 
-#grid details
-num_dimensions = 2
-lower_limit = np.array([-0.5,-0.5])
-upper_limit = np.array([0.5,0.5])
-resolution = np.array([.005,.005])
+joint_error_margin = 0.1
+
+
+#Grid details
+num_dimensions = 1
+lower_limit = np.array([0.0])
+upper_limit = np.array([5.0])
+resolution = np.array([.01])
 
 #initialise environment, genome and repertoire generator
-prosthetic_env = ProstheticEAEnv(seed=seed,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task)
+prosthetic_env = ProstheticEAEnv(seed=seed,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task,
+								 joint_error_margin=joint_error_margin,visualize=visualize)
 prosthetic_genome = ProstheticGenome(seed=seed)
 map_elites = MAP_Elites(env=prosthetic_env,qd_function=prosthetic_env.qd_steady_runner,genome_constructor=ProstheticGenome,seed=seed,
 	selector=Curiosity_Driven_Selector(),num_dimensions=num_dimensions,lower_limit=lower_limit,upper_limit=upper_limit,

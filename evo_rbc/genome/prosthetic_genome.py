@@ -39,6 +39,10 @@ class ProstheticGenome(Genome):
 
 	gait_time_period_low = [50.0]
 	gait_time_period_high = [150.0]
+
+	## exponential scale ---- 2^(amp damper)
+	amplitude_multiplier_low = [-1.0]  ## = 0.5 times original amplitutde
+	amplitude_multiplier_high = [0.5]  ## = 1.41x change
 	
 	initial_phase_low = [0.0]
 	initial_phase_high = [0.99]
@@ -46,8 +50,8 @@ class ProstheticGenome(Genome):
 	soleus_amplitude_low = [0.7,0.0]
 	soleus_amplitude_high = [0.8,0.05]
 	
-	gastroc_amplitude_low = [0.7,0.1]
-	gastroc_amplitude_high = [0.8,0.15]
+	gastroc_amplitude_low = [0.7,0.12]
+	gastroc_amplitude_high = [0.8,0.17]
 
 	tib_ant_amplitude_low = [0.5,0.45,0.6]
 	tib_ant_amplitude_high = [0.6,0.5,0.65]
@@ -79,8 +83,8 @@ class ProstheticGenome(Genome):
 	soleus_wave_width_percentage_low = [0.3,0.1]
 	soleus_wave_width_percentage_high = [0.35,0.2]
 
-	gastroc_wave_start_percentage_low = [0.05,0.05]
-	gastroc_wave_start_percentage_high = [0.1,0.1]
+	gastroc_wave_start_percentage_low = [0.07,0.05]
+	gastroc_wave_start_percentage_high = [0.12,0.1]
 	gastroc_wave_width_percentage_low = [0.4,0.13]
 	gastroc_wave_width_percentage_high = [0.5,0.18]
 
@@ -142,6 +146,7 @@ class ProstheticGenome(Genome):
 	def __init__(self,parameters=None,seed=1):
 		self.parameter_space = spaces.Dict({		
 		"gait_time_period_space":spaces.Box(low=self._nparray(self.gait_time_period_low),high=self._nparray(self.gait_time_period_high),dtype=np.float32),
+		"amplitude_multiplier_space":spaces.Box(low=self._nparray(self.amplitude_multiplier_low),high=self._nparray(self.amplitude_multiplier_high),dtype=np.float32),
 		"initial_phase_space":spaces.Box(low=self._nparray(self.initial_phase_low),high=self._nparray(self.initial_phase_high),dtype=np.float32),
 		"soleus_amplitude_space":spaces.Box(low=self._nparray(self.soleus_amplitude_low),high=self._nparray(self.soleus_amplitude_high),dtype=np.float32),
 		"soleus_wave_start_percentage_space":spaces.Box(low=self._nparray(self.soleus_wave_start_percentage_low),
@@ -251,12 +256,15 @@ class ProstheticGenome(Genome):
 		else:
 			return self._calculate_wave(muscle_name,time_step) 
 			
-	def _truncated_function(self,function,lower_limit,upper_limit,arguement,timestep):
+	def _truncated_function(self,function,lower_limit,upper_limit,timestep,**kwargs):
 		if(timestep < lower_limit or timestep > upper_limit):
 			return 0
 		else:
-			return function(arguement)
+			return function(**kwargs)
 
+	def gaussian(self,x,mean,sigma):
+		exponent = np.square(x-mean)/2/sigma/sigma
+		return  np.exp(-1*exponent)
 
 	def _calculate_wave(self,muscle_name,time_step):
 		gait_time_period = self.parameters["gait_time_period"]
@@ -270,7 +278,10 @@ class ProstheticGenome(Genome):
 				current_cycle_count = cycle_count - 1
 			start_time_step_i = int((current_cycle_count + self.parameters[muscle_name+"_wave_start_percentage"][i] )*gait_time_period) + initial_phase_steps
 			end_time_step_i = start_time_step_i + int(self.parameters[muscle_name+"_wave_width_percentage"][i] *gait_time_period)
-			wave_i = self.parameters[muscle_name+"_amplitude"][i]*self._truncated_function(np.sin,start_time_step_i,end_time_step_i,
-				np.pi*(time_step-start_time_step_i)/(end_time_step_i-start_time_step_i),time_step)
+			# wave_i = self.parameters[muscle_name+"_amplitude"][i]*self._truncated_function(np.sin,start_time_step_i,end_time_step_i,
+			# 	np.pi*(time_step-start_time_step_i)/(end_time_step_i-start_time_step_i),time_step)
+			wave_i = self.parameters[muscle_name+"_amplitude"][i]*self._truncated_function(self.gaussian,start_time_step_i,end_time_step_i,
+				time_step,x=time_step,mean=(start_time_step_i+end_time_step_i)/2,sigma=(end_time_step_i-start_time_step_i)/4)
+
 			wave += wave_i
-		return wave
+		return wave*pow(2,self.parameters["amplitude_multiplier"]) + 0.01 * np.random.normal(0,1)

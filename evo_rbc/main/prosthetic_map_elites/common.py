@@ -16,6 +16,9 @@ max_time_steps_qd=300
 max_time_steps_task=2000
 visualise = False
 
+joint_error_margin = 0.1
+
+
 #Grid details
 num_dimensions = 1
 lower_limit = np.array([0.0])
@@ -24,7 +27,7 @@ resolution = np.array([.01])
 
 
 #initialise environment, genome and repertoire generator
-prosthetic_env = ProstheticEAEnv(seed=seed,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task)
+prosthetic_env = ProstheticEAEnv(seed=seed,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task,joint_error_margin=joint_error_margin)
 prosthetic_genome = ProstheticGenome(seed=seed)
 map_elites = MAP_Elites(env=prosthetic_env,qd_function=prosthetic_env.qd_steady_runner,genome_constructor=ProstheticGenome,seed=seed,
 	selector=Curiosity_Driven_Selector(),num_dimensions=num_dimensions,lower_limit=lower_limit,upper_limit=upper_limit,

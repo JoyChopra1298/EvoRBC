@@ -5,7 +5,7 @@ prosthetic_genome = ProstheticGenome()
 
 control_duration = 10
 num_generations = 1
-muscle_index = 5
+muscle_index = 16
 
 test_utils.print_heading("Parameter space")
 print(prosthetic_genome.parameter_space)
@@ -36,7 +36,7 @@ child_genome = prosthetic_genome.crossover(prosthetic_genome_2)
 print(child_genome.parameters)
 
 test_utils.print_heading("Showing plot for muscle " + child_genome.muscle_dict[muscle_index])
-child_genome.plot_control_function(num_timesteps=200,muscle_index=muscle_index)
+child_genome.plot_control_function(num_timesteps=100,muscle_index=muscle_index)
 child_genome.mutate(0.5)
-child_genome.plot_control_function(num_timesteps=200,muscle_index=muscle_index)
+child_genome.plot_control_function(num_timesteps=100,muscle_index=muscle_index)
 
