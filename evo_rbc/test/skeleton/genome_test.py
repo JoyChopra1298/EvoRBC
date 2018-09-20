@@ -35,6 +35,7 @@ test_utils.print_heading("Child Genome")
 child_genome = prosthetic_genome.crossover(prosthetic_genome_2)
 print(child_genome.parameters)
 
+test_utils.print_heading("Showing plot for muscle " + child_genome.muscle_dict[muscle_index])
 child_genome.plot_control_function(num_timesteps=200,muscle_index=muscle_index)
 child_genome.mutate(0.5)
 child_genome.plot_control_function(num_timesteps=200,muscle_index=muscle_index)

@@ -57,6 +57,17 @@ class MAP_Elites(Repertoire_Generator):
 					child_genome.mutate(sigma=mutation_stdev*(j+1))
 					children_genomes.append(child_genome)
 
+			children_genomes_len = len(children_genomes)
+			# add random genomes for rest of the batch size .
+			# add twice the batch size if less than 25% batch was filled
+			if(children_genomes_len < self.batch_size * 0.25):
+				extra_random_genomes_len = (2 * self.batch_size) - children_genomes_len
+			else:
+				extra_random_genomes_len = self.batch_size - children_genomes_len
+
+			for i in range(extra_random_genomes_len):
+				children_genomes.append(self.genome_constructor(seed=self.seed))
+
 			qd_evaluations = self.parallel_evaluate(genomes=children_genomes,num_processes=num_processes,visualise=visualise)
 
 			## initialise metrics for current iteration
@@ -64,7 +75,7 @@ class MAP_Elites(Repertoire_Generator):
 			total_quality_increase_by_better_genomes_in_this_iteration = 0
 			old_num_genomes = self.container.num_genomes
 
-			for i in range(len(children_genomes)):
+			for i in range(children_genomes_len):
 				child_genome = children_genomes[i]
 				parent_index = int(i/child_multiplier)
 				behavior,quality = qd_evaluations[i%num_processes][int(i/num_processes)]
@@ -88,15 +99,20 @@ class MAP_Elites(Repertoire_Generator):
 						total_quality_increase_by_better_genomes_in_this_iteration += quality - old_genome_quality
 
 					parents[parent_index][1]["curiosity"] *= self.container.curiosity_multiplier
-					self.container.update_curiosity(bin_index=parent_bin_index,genome_details=parents[parent_index][1]["curiosity"])
+					self.container.update_curiosity(bin_index=parent_bin_index,curiosity=parents[parent_index][1]["curiosity"])
 					self.container.add_genome(genome=child_genome,behavior=behavior,quality=quality)
 
 				else:
 					parents[parent_index][1]["curiosity"] /= self.container.curiosity_multiplier
 					parents[parent_index][1]["curiosity"] = np.clip(a=parents[parent_index][1]["curiosity"],a_min=self.container.min_curiosity,a_max=np.inf)
-					self.container.update_curiosity(bin_index=parent_bin_index,genome_details=parents[parent_index][1]["curiosity"])
+					self.container.update_curiosity(bin_index=parent_bin_index,curiosity=parents[parent_index][1]["curiosity"])
 				self.logger.debug("parent_curiosity after "+str(parents[parent_index][1]["curiosity"]))
-			
+
+			for i in range(children_genomes_len,children_genomes_len+extra_random_genomes_len):
+				behavior, quality = qd_evaluations[i % num_processes][int(i / num_processes)]
+				if (self.container.is_high_quality(behavior=behavior, quality=quality)):
+					self.container.add_genome(genome=random_genomes[i], behavior=behavior, quality=quality)
+
 			## Store metrics
 			self.metrics["num_better_genome_found"].append(num_better_genome_found_in_this_iteration)
 			self.metrics["total_quality_increase_by_better_genomes"].append(total_quality_increase_by_better_genomes_in_this_iteration)
@@ -111,12 +127,13 @@ class MAP_Elites(Repertoire_Generator):
 				self.logger.info("Normalised quality increase by better genomes in this iteration "
 					+str(total_quality_increase_by_better_genomes_in_this_iteration/num_better_genome_found_in_this_iteration))
 			self.logger.info("Number of new genomes added in this iteration "+str(self.container.num_genomes - old_num_genomes)+"\n")
-			
+
+			self.current_iteration+=1
+
 			## Save repertoire
 			if(iteration%save_freq==0 and (save_dir is not None)):
 				self.save_repertoire(save_file_path=save_dir+"map_elites_repertoire_"+str(iteration)+".pkl")
 				self.logger.info("Saving repertoire for iteration "+str(iteration)+"\n")
-			self.current_iteration+=1
 
 	def log_metrics(self):
 		self.logger.info("Repertoire Metrics")

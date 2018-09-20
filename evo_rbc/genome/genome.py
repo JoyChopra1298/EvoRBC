@@ -59,7 +59,7 @@ class Genome:
 		"""Plot the control function of the genome for specified number of time steps"""
 		control_values = []
 		for i in range(num_timesteps):
-			control_values.append(self.control_function(time_step=i+1,**kwargs))
+			control_values.append(self.control_function(time_step=i+1,**kwargs)[0])
 		plt.plot([i+1 for i in range(num_timesteps)],control_values)
 		plt.xlabel('Time step')
 		plt.ylabel('Control value')

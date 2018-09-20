@@ -1,6 +1,6 @@
 from evo_rbc.main.prosthetic_map_elites.common import get_MAPElites
 
-load_path = "map_elites_repertoire_25.pkl"
+load_path = "output/map_elites_repertoire_75.pkl"
 
 map_elites = get_MAPElites()
 map_elites.load_repertoire(load_path)
@@ -17,5 +17,17 @@ def play(bin_index):
 
 behavior = map_elites.container.min_quality_bin
 
-play((61,))
-# map_elites.view_metrics("num_new_genomes")
+play((33,))
+
+
+# total_quality = 0
+# for bin_index,genome_details in map_elites.container.grid.items():
+# 	total_quality += 1
+# print(total_quality,map_elites.container.num_genomes)
+# genome_details = map_elites.container.grid[(0,)]
+# map_elites.container.add_genome(genome_details["genome"],0.041,genome_details["quality"])
+# # map_elites.container.update_bin((4,),genome_details)
+# # play((4,))
+# map_elites.container.add_genome(genome_details["genome"],0.041,genome_details["quality"])
+
+# # map_elites.view_metrics("num_new_genomes")

@@ -60,13 +60,11 @@ test_utils.print_heading("Select samples uniformly from container")
 uniform_random_selector = Uniform_Random_Selector()
 sampled_population = uniform_random_selector.select(container.grid,3)
 print(sampled_population)
-print("Sampled genome parameters - smoothness",[genome_details["genome"].parameters["smoothness"] for bin_index,genome_details in sampled_population])
 
 test_utils.print_heading("Select samples based on curiosity scores from container")
 curiosity_driven_selector = Curiosity_Driven_Selector()
 sampled_population = curiosity_driven_selector.select(container.grid,3)
 print(sampled_population)
-print("Sampled genome parameters - smoothness",[genome_details["genome"].parameters["smoothness"] for bin_index,genome_details in sampled_population])
 
 ## update curiosity of particular elements to see bias
 new_genome_details = sampled_population[0][1]
@@ -75,7 +73,6 @@ container.update_bin(bin_index=sampled_population[0][0],genome_details=new_genom
 test_utils.print_heading("Test biased curiosity. should output first element of previous test most probably")
 for i in range(5):
 	sampled_population = curiosity_driven_selector.select(container.grid,1)
-	print("Sampled genome parameters - smoothness",[genome_details["genome"].parameters["smoothness"] for bin_index,genome_details in sampled_population])
 
 
 #### generate repertoire test
