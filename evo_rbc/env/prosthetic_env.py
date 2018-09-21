@@ -1,5 +1,4 @@
 import statistics as stats
-import time
 
 from osim.env import ProstheticsEnv
 
@@ -35,18 +34,9 @@ class ProstheticEAEnv(EAenv, ProstheticsEnv):
 
         performance = 0.0
 
-        start_time = time.time()
         self.logger.debug("Starting an evaluation for steady skeleton runner")
 
         for time_step in range(self.max_time_steps_qd):
-
-            # stop if evaluation taking too much time (more than 5 minutes)
-            current_time = time.time()
-            if ((current_time - start_time) > 300):
-                mean_velocity_x = stats.mean(pelvis_kinematics["vx"])
-                behavior = mean_velocity_x
-                self.logger.debug("Evaluation stopped since too much time elapsed. Behavior " + str(behavior))
-                return (-1000.0, -1000.0)
 
             if (not done):
                 action = []
