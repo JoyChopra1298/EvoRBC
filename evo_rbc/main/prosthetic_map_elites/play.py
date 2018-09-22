@@ -1,6 +1,6 @@
 from evo_rbc.main.prosthetic_map_elites.common import get_MAPElites
 
-load_path = "output/map_elites_repertoire_75.pkl"
+load_path = "map_elites_repertoire_5.pkl"
 
 map_elites = get_MAPElites()
 map_elites.load_repertoire(load_path)
@@ -17,7 +17,7 @@ def play(bin_index):
 
 behavior = map_elites.container.min_quality_bin
 
-play((33,))
+play((0,))
 
 
 # total_quality = 0

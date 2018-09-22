@@ -61,13 +61,13 @@ class ProstheticEAEnv(EAenv, ProstheticsEnv):
                 if (pelvis_position_vector_y < 0.75):
                     performance -= 1
 
-                performance += 2 * (state_desc["body_pos"]["head"][0] - state_desc["body_pos"]["pelvis"][0])
+                performance += 5 * (state_desc["body_pos"]["head"][0] - state_desc["body_pos"]["pelvis"][0])
 
                 ### restrict knee and hip angles
 
                 knee_rot_min = -1.7
-                knee_rot_max = 0.15
-                hip_rot_min = -0.65
+                knee_rot_max = 0.1
+                hip_rot_min = -0.6
                 hip_rot_max = 0.6
 
 
@@ -111,12 +111,10 @@ class ProstheticEAEnv(EAenv, ProstheticsEnv):
         ##penalise negative velocity
         if (behavior < 0):
             performance -= 50.0
+        else:
+            performance += len(pelvis_kinematics["vx"]) * ((mean_velocity_x ** 2) - (stats.stdev(pelvis_kinematics["vx"])**2) + 0.25)
 
-        performance += len(pelvis_kinematics["vx"]) * (
-                (mean_velocity_x ** 2) - stats.stdev(pelvis_kinematics["vx"]) ** 2)
-
-        self.logger.debug("Evaluation finished with\nbehavior " + str(behavior) + "\nperformance " + str(
-            performance) + "\n survived for timesteps "
-                          + str(len(pelvis_kinematics["vx"])))
+        self.logger.debug("Evaluation finished with\nbehavior " + str(behavior) + "\nperformance " + str(performance) 
+            + "\n survived for timesteps " + str(len(pelvis_kinematics["vx"])))
 
         return (behavior, performance)

@@ -4,17 +4,18 @@ import copy
 
 class ESGrid(Container):
 
-	def __init__(self,num_dimensions,lower_limit,upper_limit,resolution):
+	def __init__(self,num_dimensions,lower_limit,upper_limit,resolution,genome_constructor):
 		"""lower_limit, upper_limit and resolution should be np arrays of shape (num_dimension) to specify them for each dimension"""
 		super().__init__()
 		self.num_dimensions = num_dimensions
 		self.lower_limit = lower_limit
 		self.upper_limit = upper_limit
 		self.resolution = resolution
-		self.num_bins = np.ceil((upper_limit - lower_limit)/resolution).astype(int)
-		
-		#initialise grid with empty bins. will store a dict in each bin {"genome":,...might add more metrics later}
-		self.grid = {}
+		self.num_bins = tuple(np.ceil((upper_limit - lower_limit)/resolution).astype(int))
+		self.genome_constructor = genome_constructor
+
+		# initialise grid with empty bins
+		self.grid = np.empty(self.num_bins,dtype=self.genome_constructor)
 		self.logger.debug("Grid initialised")
 		
 	def get_bin(self,behavior):

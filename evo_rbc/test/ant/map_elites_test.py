@@ -1,7 +1,6 @@
 from evo_rbc.qd_solver.map_elites import MAP_Elites
 from evo_rbc.genome.ant_genome import AntGenome
 from evo_rbc.env.ant_env import AntEAEnv
-from evo_rbc.qd_solver.container.grid import Grid
 import numpy as np
 import evo_rbc.main.utils as test_utils
 from evo_rbc.qd_solver.selector.uniform_random_selector import Uniform_Random_Selector

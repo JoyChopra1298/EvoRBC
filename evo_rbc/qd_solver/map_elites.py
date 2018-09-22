@@ -111,8 +111,8 @@ class MAP_Elites(Repertoire_Generator):
 			for i in range(children_genomes_len,children_genomes_len+extra_random_genomes_len):
 				behavior, quality = qd_evaluations[i % num_processes][int(i / num_processes)]
 				if (self.container.is_high_quality(behavior=behavior, quality=quality)):
+					bin_index = self.container.get_bin(behavior)
 					if (bin_index in self.container.grid):
-						bin_index = self.container.get_bin(behavior)
 						old_genome_quality = self.container.grid[bin_index]["quality"]
 						self.logger.debug("Old quality in same bin " + str(old_genome_quality))
 						num_better_genome_found_in_this_iteration += 1
