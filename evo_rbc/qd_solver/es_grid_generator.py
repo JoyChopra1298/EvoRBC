@@ -17,7 +17,8 @@ class ES_Grid_Generator(Repertoire_Generator):
 		super().__init__(env=env,genome_constructor=genome_constructor,batch_size=batch_size,seed=seed)
 
 
-	def generate_repertoire(self,num_iterations,save_dir,save_freq,visualise,mutation_stdev=0.01,num_processes=1):
+	def generate_repertoire(self,num_iterations,save_dir,save_freq,visualise,mutation_stdev=0.01,num_processes=1,
+							num_samples_per_bin=1):
 		"""
 		populate grid with random parameters.
 		"""
@@ -26,30 +27,37 @@ class ES_Grid_Generator(Repertoire_Generator):
 
 		for iteration in range(self.current_iteration,self.current_iteration+num_iterations):
 
-			sampled_genomes = []
-			probability_of_samples = []
+			grid_sampled_genomes = []
+			grid_probability_of_samples = []
 
 			### generate samples from each bin. also add their negative i.e. antithetic sampling
 			for index in np.ndindex(self.container.num_bins):
 				grid_genome = self.container.grid[index]
-				sampled_genome = copy.deepcopy(grid_genome).mutate(mutation_stdev)
-				epsilon = sampled_genome.parameters - grid_genome.parameters
-				sampled_negative = self.genome_constructor(parameters=grid_genome.parameters - epsilon)
-				sampled_genomes.append((sampled_genome,sampled_negative))
+				bin_sampled_genomes = []
+				bin_probability_of_samples = []
+				for i in range(num_samples_per_bin):
+					sampled_genome = copy.deepcopy(grid_genome).mutate(mutation_stdev)
+					epsilon = sampled_genome.parameters - grid_genome.parameters
+					sampled_negative = self.genome_constructor(parameters=grid_genome.parameters - epsilon)
+					bin_sampled_genomes.append((sampled_genome,sampled_negative))
 
-				### store P( new params | old params) = truncnorm.pdf
-				sampled_genome_parameters_probability = []
-				for key, value in sampled_genome.parameters.items():
-					low = self.parameter_space.spaces[key + "_space"].low
-					high = self.parameter_space.spaces[key + "_space"].high
-					mu = grid_genome.parameters[key]
-					for i in range(low.shape[0]):
-						sigma_temp = mutation_stdev * (high[i] - low[i])
-						## truncnorm's clipped parameters are according to a standard normal so scale accordingly. refer their documentation for more details
-						standard_low = (low[i] - mu[i]) / sigma_temp
-						standard_high = (high[i] - mu[i]) / sigma_temp
-						sampled_genome_parameters_probability.append(truncnorm.pdf(value,standard_low, standard_high, loc=mu[i], scale=sigma_temp))
-					self.parameters[key] = self._nparray(sampled_genome_parameters_probability)
+					### store P( new params | old params) = truncnorm.pdf
+					sampled_genome_parameters_probability = []
+					for key, value in sampled_genome.parameters.items():
+						low = sampled_genome.parameter_space.spaces[key + "_space"].low
+						high = sampled_genome.parameter_space.spaces[key + "_space"].high
+						mu = grid_genome.parameters[key]
+						for i in range(low.shape[0]):
+							sigma_temp = mutation_stdev * (high[i] - low[i])
+							## truncnorm's clipped parameters are according to a standard normal so scale accordingly. refer their documentation for more details
+							standard_low = (low[i] - mu[i]) / sigma_temp
+							standard_high = (high[i] - mu[i]) / sigma_temp
+							sampled_genome_parameters_probability.append(truncnorm.pdf(value,standard_low, standard_high,
+																					   loc=mu[i], scale=sigma_temp))
+					bin_probability_of_samples.append(sampled_genome_parameters_probability)
+				grid_sampled_genomes.append(bin_sampled_genomes)
+				grid_probability_of_samples.append(bin_probability_of_samples)
+				
 			### parallel evaluation
 
 			self.current_iteration+=1

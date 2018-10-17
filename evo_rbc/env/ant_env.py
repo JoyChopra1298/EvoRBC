@@ -1,13 +1,14 @@
 from gym.envs.mujoco.ant import AntEnv
 from .eaenv import EAenv
 import statistics as stats
+import numpy as np
 
 class AntEAEnv(EAenv,AntEnv):
 
-	def __init__(self,seed=1,max_time_steps_qd=1000,max_time_steps_task=2000):
+	def __init__(self,seed=1,max_time_steps_qd=1000,max_time_steps_task=2000,only_return_general_reward=False):
 		AntEnv.__init__(self)
 		self.seed(seed)
-		EAenv.__init__(self,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task)
+		EAenv.__init__(self,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task,only_return_general_reward=only_return_general_reward)
 		self.mpi_worker_path = '../../mpi_worker/ant_evaluation_worker.py'
 		# self.logger.debug("Created ant environment")
 
@@ -43,8 +44,11 @@ class AntEAEnv(EAenv,AntEnv):
 		also they are not attributes of genome like genome.behavior, genome.performance since can have various fitness func 
 		although then could use a dictionary"""
 		behavior = (stats.mean(torso_kinematics["vx"]),stats.mean(torso_kinematics["vy"]))
-		performance = - (stats.stdev(torso_kinematics["vx"]) + stats.stdev(torso_kinematics["vy"]) + stats.stdev(torso_kinematics["rz"]))
-		self.logger.debug("Evaluation finished with\nbehavior "+str(behavior)+"\nperformance "+str(performance))
+		performance = 0.0
+		if( not self.only_return_general_reward):
+			"""add behavior specific information to the reward"""
+			performance -= (stats.stdev(torso_kinematics["vx"]) + stats.stdev(torso_kinematics["vy"]) + stats.stdev(torso_kinematics["rz"]))
+			self.logger.debug("Evaluation finished with\nbehavior "+str(behavior)+"\nperformance "+str(performance))
 		return (behavior,performance)
 
 	def reset_model(self):
@@ -52,3 +56,12 @@ class AntEAEnv(EAenv,AntEnv):
 		qvel = self.init_qvel
 		self.set_state(qpos, qvel)
 		return self._get_obs()
+
+	"""override since want to use torso positions too"""
+
+	def _get_obs(self):
+		return np.concatenate([
+			self.sim.data.qpos.flat,
+			self.sim.data.qvel.flat,
+			np.clip(self.sim.data.cfrc_ext, -1, 1).flat,
+		])

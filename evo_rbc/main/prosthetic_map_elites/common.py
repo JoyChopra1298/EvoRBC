@@ -10,7 +10,6 @@ from evo_rbc.qd_solver.selector.curiosity_driven_selector import Curiosity_Drive
 
 ##################################
 #Constants/hyperparameters
-seed = 1
 batch_size = 100
 max_time_steps_qd=300
 max_time_steps_task=2000
@@ -26,13 +25,14 @@ upper_limit = np.array([5.0])
 resolution = np.array([.01])
 
 
-#initialise environment, genome and repertoire generator
-prosthetic_env = ProstheticEAEnv(seed=seed,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task,joint_error_margin=joint_error_margin)
-prosthetic_genome = ProstheticGenome(seed=seed)
-map_elites = MAP_Elites(env=prosthetic_env,qd_function=prosthetic_env.qd_steady_runner,genome_constructor=ProstheticGenome,seed=seed,
-	selector=Curiosity_Driven_Selector(),num_dimensions=num_dimensions,lower_limit=lower_limit,upper_limit=upper_limit,
-	resolution=resolution,batch_size=batch_size)
+def get_MAPElites(seed=1):
+	
+	#initialise environment, genome and repertoire generator
+	prosthetic_env = ProstheticEAEnv(seed=seed,max_time_steps_qd=max_time_steps_qd,max_time_steps_task=max_time_steps_task,
+		joint_error_margin=joint_error_margin)
+	map_elites = MAP_Elites(env=prosthetic_env,qd_function=prosthetic_env.qd_steady_runner,genome_constructor=ProstheticGenome,seed=seed,
+		selector=Curiosity_Driven_Selector(),num_dimensions=num_dimensions,lower_limit=lower_limit,upper_limit=upper_limit,
+		resolution=resolution,batch_size=batch_size)
 
-def get_MAPElites():
 	return map_elites
 

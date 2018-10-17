@@ -1,9 +1,7 @@
 from evo_rbc.main.prosthetic_map_elites.common import get_MAPElites
 
-load_path = "map_elites_repertoire_5.pkl"
+load_path = "map_elites_repertoire_330.pkl"
 
-map_elites = get_MAPElites()
-map_elites.load_repertoire(load_path)
 
 def play(bin_index):
 	if bin_index not in map_elites.container.grid:
@@ -13,12 +11,21 @@ def play(bin_index):
 	behavior,quality = map_elites.env.evaluate_quality_diversity_fitness(qd_function=map_elites.qd_function,
 					primitive_genome=genome,visualise=True)
 	print(behavior,quality,map_elites.container.get_bin(behavior))
-	print(map_elites.container.grid[bin_index]["quality"],bin_index)
+	# print(map_elites.container.grid[bin_index]["quality"],bin_index)
+	return quality
 
-behavior = map_elites.container.min_quality_bin
+max_quality = -1000.0
+max_quality_seed = 0
+for seed in range(1,100):
+	map_elites = get_MAPElites(seed=seed)
+	map_elites.load_repertoire(load_path)
+	print('Seed ------------ ',seed)
+	quality = play((2,))
+	if(quality > max_quality):
+		max_quality = quality
+		max_quality_seed = seed
 
-play((0,))
-
+print("Max qaulity seed and quality ---",max_quality_seed,max_quality)
 
 # total_quality = 0
 # for bin_index,genome_details in map_elites.container.grid.items():

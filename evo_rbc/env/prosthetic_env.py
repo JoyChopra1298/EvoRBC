@@ -74,12 +74,12 @@ class ProstheticEAEnv(EAenv, ProstheticsEnv):
                 osim_model = self.osim_model
                 model = osim_model.model
                 state = osim_model.state
-
+                '''
                 ### KNEE - should be between 0 to around 72 degree (1.25 radian) Error margin - 0.1
                 #  ..... mostly should be near 20 degree
                 knee_right_rot = model.getStateVariableValue(state, "knee_r/knee_angle_r/value")
                 knee_left_rot = model.getStateVariableValue(state, "knee_l/knee_angle_l/value")
-
+                
                 if(knee_left_rot > (knee_rot_max + self.joint_error_margin) or knee_left_rot < (knee_rot_min-self.joint_error_margin)):
                     self.logger.debug("Evaluation stopped since left knee angle outside permissible range "
                                       +str(knee_left_rot) + " at time step " + str(time_step))
@@ -102,12 +102,12 @@ class ProstheticEAEnv(EAenv, ProstheticsEnv):
                     self.logger.debug("Evaluation stopped since right hip angle outside permissible range "
                                       + str(knee_right_rot)+ " at time step " + str(time_step))
                     return (-2000.0, -2000.0)
+                '''
 
                 ############ end of angle restrictions
 
         mean_velocity_x = stats.mean(pelvis_kinematics["vx"])
         behavior = mean_velocity_x
-
         ##penalise negative velocity
         if (behavior < 0):
             performance -= 50.0

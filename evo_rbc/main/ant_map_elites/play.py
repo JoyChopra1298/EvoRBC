@@ -1,6 +1,7 @@
 from evo_rbc.main.ant_map_elites.common import get_MAPElites
+import pickle
 
-load_path = "ant_map_elites_repertoire_1975.pkl"
+load_path = "output_3/ant_map_elites_repertoire_2225.pkl"
 
 map_elites = get_MAPElites()
 map_elites.load_repertoire(load_path)
@@ -10,6 +11,19 @@ def play(bin_index):
 		print("not present")
 		return
 	genome = map_elites.container.grid[bin_index]["genome"]
+	# obs = map_elites.env.reset()
+	# print(obs)
+	# expert_trajectory = []
+	# expert_trajectory.append(obs)
+	# for i in range(500):
+	# 	action = []
+	# 	for joint_index in range(map_elites.env.action_space.shape[0]):
+	# 		action.append(genome.control_function(joint_index=joint_index, time_step=i))
+	# 	observation, _, _, _ = map_elites.env.step(action)
+	# 	expert_trajectory.append(observation)
+	# with open("ant_obs_forward_expert.pkl", 'wb') as f:
+	# 	pickle.dump([expert_trajectory],f)
+
 	behavior,quality = map_elites.env.evaluate_quality_diversity_fitness(qd_function=map_elites.qd_function,
 					primitive_genome=genome,visualise=True)
 	print(behavior,quality,map_elites.container.get_bin(behavior))
